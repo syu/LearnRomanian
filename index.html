@@ -625,7 +625,6 @@ function renderMatch() {
       a.el.classList.add('done'); el.classList.add('done');
       M.ok++;
       if (!M.mistakes.has(w)) record(w, true);
-      if (side === 'R' && settings.autoplay) Speech.say(w);
       if (done.size === ch.length) setTimeout(() => {
         if (screen !== 'match') return;
         M.ci++;
