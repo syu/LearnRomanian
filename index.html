@@ -108,7 +108,9 @@
     transition: border-color .12s, background .12s; }
   .opt:hover:not(:disabled) { border-color: var(--blue); }
   .opt .k { position: absolute; left: 10px; top: 8px; font-size: 12px; color: var(--muted); font-weight: 700; }
-  .opts.pics .opt { padding: 18px 8px; display: grid; place-items: center; min-height: 140px; }
+  .opts.pics .opt { padding: 18px 8px 14px; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 8px; min-height: 150px; text-align: center; }
+  .opt .cap { font-size: 17px; line-height: 1.25; }
   .opts.pics { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
   .opt.right { border-color: var(--ok); background: var(--ok-soft); }
   .opt.wrong { border-color: var(--bad); background: var(--bad-soft); }
@@ -131,7 +133,8 @@
   .col { display: flex; flex-direction: column; gap: 8px; }
   .mi { background: var(--card); border: 2px solid var(--line); border-radius: 12px; padding: 12px;
     min-height: 62px; font-size: 18px; box-shadow: var(--shadow); transition: all .15s; }
-  .mi.p { padding: 6px; }
+  .mi.p { padding: 6px 10px; }
+  .mi .pr { display: flex; align-items: center; justify-content: center; gap: 10px; }
   .mi:hover { border-color: var(--blue); }
   .mi.sel { border-color: var(--blue); background: var(--blue-soft); }
   .mi.done { border-color: var(--ok); background: var(--ok-soft); opacity: .45; pointer-events: none; }
@@ -308,10 +311,8 @@ function picHTML(w, size = '') {
 
 /* ================= modes ================= */
 const QUIZ_TYPES = ['ro-ru', 'ru-ro', 'audio-ru', 'ro-pic', 'pic-ro'];
-const PIC_MODES = ['ro-pic', 'pic-ro', 'match-pic'];
-// question type for "mix": words without a picture get only text/audio questions
-const mixType = w => pickRandom(hasPic(w) ? QUIZ_TYPES : QUIZ_TYPES.filter(t => !PIC_MODES.includes(t)));
-const wordsForMode = (mode, words = selectedWords()) => PIC_MODES.includes(mode) ? words.filter(hasPic) : words;
+// question type for "mix": words without a picture skip the picture types
+const mixType = w => pickRandom(hasPic(w) ? QUIZ_TYPES : QUIZ_TYPES.filter(t => t !== 'ro-pic' && t !== 'pic-ro'));
 // same synonym group (syn) — never offered together as options or in one pairs round
 const sameSyn = (a, b) => !!(a.syn && a.syn === b.syn);
 const MODES = [
@@ -321,12 +322,12 @@ const MODES = [
   { id: 'ro-ru', ic: '🔤', name: 'RO → RU', desc: 'Выбрать перевод слова' },
   { id: 'ru-ro', ic: '🔁', name: 'RU → RO', desc: 'Выбрать румынское слово' },
   { id: 'audio-ru', ic: '🎧', name: 'На слух', desc: 'Услышать и выбрать перевод' },
-  { group: 'Картинки' },
-  { id: 'ro-pic', ic: '🖼️', name: 'Слово → картинка', desc: 'Выбрать подходящую картинку' },
-  { id: 'pic-ro', ic: '🔍', name: 'Картинка → слово', desc: 'Выбрать слово к картинке' },
+  { group: 'С картинками' },
+  { id: 'ro-pic', ic: '🖼️', name: 'RO → картинка', desc: 'Перевод с картинкой-подсказкой' },
+  { id: 'pic-ro', ic: '🔍', name: 'Картинка → RO', desc: 'Картинка с переводом → румынское слово' },
   { group: 'Пары' },
   { id: 'match-ru', ic: '🧩', name: 'Слово — перевод', desc: 'Соединить пары из двух списков' },
-  { id: 'match-pic', ic: '🧩', name: 'Слово — картинка', desc: 'Соединить слова и картинки' },
+  { id: 'match-pic', ic: '🧩', name: 'Слово — картинка', desc: 'Пары: слово и картинка с переводом' },
   { group: 'Всё вместе' },
   { id: 'mix', ic: '🎲', name: 'Микс', desc: 'Все типы вопросов вперемешку' },
 ];
@@ -334,8 +335,8 @@ const PROMPTS = {
   'ro-ru': 'Выберите перевод',
   'ru-ro': 'Выберите румынское слово',
   'audio-ru': 'Послушайте и выберите перевод',
-  'ro-pic': 'Выберите картинку',
-  'pic-ro': 'Что на картинке?',
+  'ro-pic': 'Выберите перевод',
+  'pic-ro': 'Выберите румынское слово',
 };
 
 let screen = 'home';
@@ -366,7 +367,7 @@ function renderHome() {
     <h2>Как учить</h2>
     <div class="modes">
       ${MODES.map(m => m.group ? `<div class="group">${m.group}</div>` :
-        `<button class="mode" data-mode="${m.id}" ${wordsForMode(m.id, sel).length < 2 ? 'disabled' : ''}>
+        `<button class="mode" data-mode="${m.id}" ${sel.length < 2 ? 'disabled' : ''}>
           <div class="ic">${m.ic}</div><b>${m.name}</b><span>${m.desc}</span></button>`).join('')}
     </div>
 
@@ -398,7 +399,7 @@ function renderHome() {
     selected = allOn ? [TOPICS[0].id] : TOPICS.map(t => t.id);
     LS.set('topics', selected); renderHome();
   };
-  app.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => startMode(b.dataset.mode, sessionWords(wordsForMode(b.dataset.mode))));
+  app.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => startMode(b.dataset.mode, sessionWords()));
   app.querySelectorAll('[data-set]').forEach(el => el.onchange = () => {
     const k = el.dataset.set;
     settings[k] = el.type === 'checkbox' ? el.checked
@@ -463,7 +464,7 @@ function buildOptions(w, type) {
   const n = settings.options;
   const isPic = type === 'ro-pic' || type === 'pic-ro';
   const okCand = c => c !== w && c.ro !== w.ro && c.ru !== w.ru && !sameSyn(c, w) &&
-    !(isPic && (!hasPic(c) || (w.grp && c.grp === w.grp) || (!w.img && !c.img && c.pic === w.pic)));
+    !(isPic && ((w.grp && c.grp === w.grp) || (hasPic(w) && c.pic === w.pic && !c.img)));
   let cand = shuffle(Q.pool.filter(okCand));
   if (cand.length < n - 1) cand = cand.concat(shuffle(ALL.filter(c => okCand(c) && !cand.includes(c))));
   return shuffle([w, ...cand.slice(0, n - 1)]);
@@ -488,11 +489,11 @@ function renderQuestion() {
   let prompt = '';
   if (type === 'ro-ru' || type === 'ro-pic') prompt = `<div class="qword">${esc(w.ro)} ${sayBtn(w)}</div>`;
   else if (type === 'ru-ro') prompt = `<div class="qword ru">${esc(w.ru)}</div>`;
-  else if (type === 'pic-ro') prompt = picHTML(w, 'lg');
+  else if (type === 'pic-ro') prompt = `${picHTML(w, 'lg')}<div class="qword ru">${esc(w.ru)}</div>`;
   else if (type === 'audio-ru') prompt = sayBtn(w, 'big');
 
   const isPicOpts = type === 'ro-pic';
-  const optLabel = o => type === 'ro-pic' ? picHTML(o) : (type === 'ru-ro' || type === 'pic-ro') ? esc(o.ro) : esc(o.ru);
+  const optLabel = o => type === 'ro-pic' ? `${picHTML(o)}<span class="cap">${esc(o.ru)}</span>` : (type === 'ru-ro' || type === 'pic-ro') ? esc(o.ro) : esc(o.ru);
 
   setHTML(`
     ${topBar(Q.i / Q.queue.length, Q.ok, Q.bad)}
@@ -611,7 +612,7 @@ function renderMatch() {
     <div class="match">
       <div class="col">${left.map((w, i) => `<button class="mi" data-side="L" data-i="${i}">${esc(w.ro)}</button>`).join('')}</div>
       <div class="col">${right.map((w, i) => `<button class="mi ${M.kind === 'pic' ? 'p' : ''}" data-side="R" data-i="${i}">${
-        M.kind === 'pic' ? picHTML(w, 'xs') : esc(w.ru)}</button>`).join('')}</div>
+        M.kind === 'pic' ? `<span class="pr">${picHTML(w, 'xs')}<span>${esc(w.ru)}</span></span>` : esc(w.ru)}</button>`).join('')}</div>
     </div>
   `);
   app.querySelector('[data-act=menu]').onclick = renderHome;
