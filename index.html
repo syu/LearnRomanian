@@ -293,19 +293,27 @@ function bindSay() {
 function setHTML(html) { app.innerHTML = html; bindSay(); }
 
 /* ================= pictures ================= */
+const hasPic = w => !!(w.pic || w.img);
 function picHTML(w, size = '') {
+  if (!hasPic(w)) return '';
   let tag = '';
   if (w.tag) {
     const t = String(w.tag).trim();
     const cls = /^[−-]/.test(t) || /^\+?[0-5]°/.test(t) ? 'cold' : /^\+/.test(t) ? 'warm' : '';
     tag = `<span class="tag ${cls}">${esc(t)}</span>`;
   }
-  const body = w.img ? `<img src="${esc(w.img)}" alt="">` : `<span class="emo">${esc(w.pic || '❓')}</span>`;
+  const body = w.img ? `<img src="${esc(w.img)}" alt="">` : `<span class="emo">${esc(w.pic)}</span>`;
   return `<div class="pic ${size}">${body}${tag}</div>`;
 }
 
 /* ================= modes ================= */
 const QUIZ_TYPES = ['ro-ru', 'ru-ro', 'audio-ru', 'ro-pic', 'pic-ro'];
+const PIC_MODES = ['ro-pic', 'pic-ro', 'match-pic'];
+// question type for "mix": words without a picture get only text/audio questions
+const mixType = w => pickRandom(hasPic(w) ? QUIZ_TYPES : QUIZ_TYPES.filter(t => !PIC_MODES.includes(t)));
+const wordsForMode = (mode, words = selectedWords()) => PIC_MODES.includes(mode) ? words.filter(hasPic) : words;
+// same synonym group (syn) — never offered together as options or in one pairs round
+const sameSyn = (a, b) => !!(a.syn && a.syn === b.syn);
 const MODES = [
   { group: 'Изучение' },
   { id: 'cards', ic: '📖', name: 'Карточки', desc: 'Посмотреть, послушать, проверить себя' },
@@ -358,7 +366,7 @@ function renderHome() {
     <h2>Как учить</h2>
     <div class="modes">
       ${MODES.map(m => m.group ? `<div class="group">${m.group}</div>` :
-        `<button class="mode" data-mode="${m.id}" ${sel.length < 2 ? 'disabled' : ''}>
+        `<button class="mode" data-mode="${m.id}" ${wordsForMode(m.id, sel).length < 2 ? 'disabled' : ''}>
           <div class="ic">${m.ic}</div><b>${m.name}</b><span>${m.desc}</span></button>`).join('')}
     </div>
 
@@ -390,7 +398,7 @@ function renderHome() {
     selected = allOn ? [TOPICS[0].id] : TOPICS.map(t => t.id);
     LS.set('topics', selected); renderHome();
   };
-  app.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => startMode(b.dataset.mode, sessionWords()));
+  app.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => startMode(b.dataset.mode, sessionWords(wordsForMode(b.dataset.mode))));
   app.querySelectorAll('[data-set]').forEach(el => el.onchange = () => {
     const k = el.dataset.set;
     settings[k] = el.type === 'checkbox' ? el.checked
@@ -442,7 +450,7 @@ function startQuiz(mode, words) {
   const pool = selectedWords();
   Q = {
     mode, words, pool,
-    queue: words.map(w => ({ w, type: mode === 'mix' ? pickRandom(QUIZ_TYPES) : mode })),
+    queue: words.map(w => ({ w, type: mode === 'mix' ? mixType(w) : mode })),
     i: 0, ok: 0, bad: 0, firstOk: 0,
     seen: new Set(), mistakes: new Set(), retries: new Map(),
     answered: false, timer: null,
@@ -454,8 +462,8 @@ function startQuiz(mode, words) {
 function buildOptions(w, type) {
   const n = settings.options;
   const isPic = type === 'ro-pic' || type === 'pic-ro';
-  const okCand = c => c !== w && c.ro !== w.ro && c.ru !== w.ru &&
-    !(isPic && ((w.grp && c.grp === w.grp) || (!w.img && !c.img && c.pic === w.pic)));
+  const okCand = c => c !== w && c.ro !== w.ro && c.ru !== w.ru && !sameSyn(c, w) &&
+    !(isPic && (!hasPic(c) || (w.grp && c.grp === w.grp) || (!w.img && !c.img && c.pic === w.pic)));
   let cand = shuffle(Q.pool.filter(okCand));
   if (cand.length < n - 1) cand = cand.concat(shuffle(ALL.filter(c => okCand(c) && !cand.includes(c))));
   return shuffle([w, ...cand.slice(0, n - 1)]);
@@ -529,7 +537,7 @@ function answer(idx) {
     if (r < 2) {   // ask this word again a bit later
       Q.retries.set(w.key, r + 1);
       const pos = Math.min(Q.queue.length, Q.i + 3 + (Math.random() * 3 | 0));
-      Q.queue.splice(pos, 0, { w, type: Q.mode === 'mix' ? pickRandom(QUIZ_TYPES) : type });
+      Q.queue.splice(pos, 0, { w, type: Q.mode === 'mix' ? mixType(w) : type });
     }
   }
   app.querySelector('.score').innerHTML = `<span class="o">✓ ${Q.ok}</span><span class="b">✗ ${Q.bad}</span>`;
@@ -579,7 +587,8 @@ function startMatch(mode, words) {
   const chunks = [];
   for (const w of words) {
     let c = chunks.find(c => c.length < target &&
-      !(kind === 'pic' && w.grp && c.some(x => x.grp === w.grp)) && !c.some(x => x.ru === w.ru));
+      !(kind === 'pic' && w.grp && c.some(x => x.grp === w.grp)) &&
+      !c.some(x => x.ru === w.ru || sameSyn(x, w)));
     if (!c) { c = []; chunks.push(c); }
     c.push(w);
   }
