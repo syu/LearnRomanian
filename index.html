@@ -168,6 +168,16 @@
   .card .cru { font-size: 16px; }
   .card .note { font-size: 13px; color: var(--muted); }
   .card .st { font-size: 12px; color: var(--muted); }
+  .card.learned { opacity: .55; }
+  .lrn { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted);
+    cursor: pointer; user-select: none; }
+  .lrn input { width: 17px; height: 17px; margin: 0; accent-color: var(--ok); cursor: pointer; }
+  .lrow { display: flex; align-items: center; gap: 8px; }
+  .lrow .mi { flex: 1; }
+  .lhint { margin-top: 10px; font-size: 13px; color: var(--muted); text-align: center; }
+  .lrninfo { margin-top: 10px; font-size: 14px; color: var(--muted); display: flex; gap: 8px;
+    align-items: center; flex-wrap: wrap; }
+  .trow .lk { color: var(--ok); font-size: 13px; margin-right: 6px; }
   .hidden-txt { filter: blur(7px); cursor: pointer; user-select: none; }
 
   /* ---------- results ---------- */
@@ -232,9 +242,14 @@ const settings = Object.assign(
 let selected = LS.get('topics', []).filter(id => TOPICS.some(t => t.id === id));
 if (!selected.length && TOPICS.length) selected = [TOPICS[0].id];
 const stats = LS.get('stats', {});
+const BY_KEY = new Map(ALL.map(w => [w.key, w]));
+// Words marked as learned are left out of all exercises (cards still show them).
+const learned = new Set(LS.get('learned', []).filter(k => BY_KEY.has(k)));
+const isLearned = w => learned.has(w.key);
 
 const saveSettings = () => LS.set('settings', settings);
 const selectedWords = () => TOPICS.filter(t => selected.includes(t.id)).flatMap(t => t.words);
+const practiceWords = () => selectedWords().filter(w => !isLearned(w));
 function record(w, ok) {
   const s = stats[w.key] || (stats[w.key] = { c: 0, w: 0 });
   ok ? s.c++ : s.w++;
@@ -309,7 +324,30 @@ function bindSay() {
     e.stopPropagation(); Speech.say(sayRegistry[+b.dataset.say]);
   }));
 }
-function setHTML(html) { app.innerHTML = html; bindSay(); }
+function setHTML(html) { app.innerHTML = html; bindSay(); bindLearn(); }
+
+/* "Learned" checkboxes: render with learnBox(), activate with bindLearn() after innerHTML. */
+function learnBox(w, withLabel = true) {
+  return `<label class="lrn" title="Выучено — больше не показывать в упражнениях"><input type="checkbox"
+    data-learn="${esc(w.key)}" ${isLearned(w) ? 'checked' : ''}>${withLabel ? '<span>выучено</span>' : ''}</label>`;
+}
+function bindLearn() {
+  app.querySelectorAll('[data-learn]').forEach(cb => {
+    if (cb.dataset.bound) return;
+    cb.dataset.bound = '1';
+    cb.closest('label').addEventListener('click', e => e.stopPropagation());
+    cb.addEventListener('change', () => setLearned(BY_KEY.get(cb.dataset.learn), cb.checked));
+  });
+}
+function setLearned(w, on) {
+  on ? learned.add(w.key) : learned.delete(w.key);
+  LS.set('learned', [...learned]);
+  app.querySelectorAll('[data-learn]').forEach(cb => { if (cb.dataset.learn === w.key) cb.checked = on; });
+  app.querySelectorAll(`.card[data-key="${CSS.escape(w.key)}"]`).forEach(c => c.classList.toggle('learned', on));
+  // drop the word's remaining single questions from the current session
+  if (on && screen === 'quiz' && Q) Q.queue = Q.queue.filter((it, i) => i <= Q.i || it.w !== w);
+  if (on) toast(`«${w.ro}» — выучено, в упражнениях больше не будет`, 2000);
+}
 
 /* ================= pictures ================= */
 const hasPic = w => !!(w.pic || w.img);
@@ -360,7 +398,8 @@ let last = null;   // { mode, words } — for "again" / "retry mistakes"
 function renderHome() {
   screen = 'home';
   sayRegistry = [];
-  const sel = selectedWords();
+  const sel = practiceWords();
+  const learnedSel = selectedWords().filter(isLearned);
   const allOn = selected.length === TOPICS.length;
   const opt = (v, cur, label) => `<option value="${v}" ${String(v) === String(cur) ? 'selected' : ''}>${label}</option>`;
   setHTML(`
@@ -378,19 +417,21 @@ function renderHome() {
       ${TOPICS.map(t => { const on = selected.includes(t.id); return `<button class="trow ${on ? 'on' : ''}" data-topic="${esc(t.id)}">
         <span class="cb">${on ? '✓' : ''}</span>
         <span class="nm">${esc(t.name)}<span class="sub">${esc(t.ru || '')}</span></span>
-        <span class="n">${t.words.length}</span></button>`; }).join('')}
+        <span class="n">${(k => k ? `<span class="lk">✓ ${k}</span>` : '')(t.words.filter(isLearned).length)}${t.words.length}</span></button>`; }).join('')}
     </div>
+    ${learnedSel.length ? `<div class="lrninfo">✓ Выучено в выбранных темах: <b>${learnedSel.length}</b> — эти слова не попадают в упражнения.
+      <button class="btn small" data-act="learned">Посмотреть / вернуть</button></div>` : ''}
 
     <button class="start" data-mode="mix" ${sel.length < 2 ? 'disabled' : ''}>
       <span class="ic">🎲</span>
-      <span><b>Начать · Микс</b><span>${sel.length} слов · все задания вперемешку, включая пары</span></span>
+      <span><b>Начать · Микс</b><span>${sel.length} слов для практики · все задания вперемешку, включая пары</span></span>
       <span class="go">→</span>
     </button>
 
     <h2>Другие режимы</h2>
     <div class="panel modelist">
       ${MODES.map(m => m.group ? `<div class="g">${m.group}</div>` :
-        `<button class="it" data-mode="${m.id}" ${sel.length < 2 ? 'disabled' : ''}>
+        `<button class="it" data-mode="${m.id}" ${(m.id === 'cards' ? selectedWords() : sel).length < (m.id === 'cards' ? 1 : 2) ? 'disabled' : ''}>
           <span class="ic">${m.ic}</span><b>${m.name}</b><span class="d">${m.desc}</span></button>`).join('')}
     </div>
 
@@ -422,7 +463,10 @@ function renderHome() {
     selected = allOn ? [] : TOPICS.map(t => t.id);
     LS.set('topics', selected); renderHome();
   };
-  app.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => startMode(b.dataset.mode, sessionWords()));
+  app.querySelectorAll('[data-mode]').forEach(b => b.onclick = () =>
+    startMode(b.dataset.mode, b.dataset.mode === 'cards' ? selectedWords() : sessionWords()));
+  const lb = app.querySelector('[data-act=learned]');
+  if (lb) lb.onclick = () => { last = { mode: 'cards', words: learnedSel }; renderCards(learnedSel, 'Выученные'); };
   app.querySelectorAll('[data-set]').forEach(el => el.onchange = () => {
     const k = el.dataset.set;
     settings[k] = el.type === 'checkbox' ? el.checked
@@ -448,7 +492,7 @@ function renderVoiceUI() {
     : 'Голос: ' + gender(e) + e.name;
 }
 
-function sessionWords(words = selectedWords()) {
+function sessionWords(words = practiceWords()) {
   // Words with more mistakes come earlier (weighted random order).
   const keyed = words.map(w => {
     const s = stats[w.key] || { c: 0, w: 0 };
@@ -460,7 +504,8 @@ function sessionWords(words = selectedWords()) {
 }
 
 function startMode(mode, words) {
-  if (!words.length) return;
+  if (mode !== 'cards') words = words.filter(w => !isLearned(w));
+  if (!words.length) { toast('Все эти слова отмечены как выученные'); return; }
   last = { mode, words };
   if (mode === 'cards') return renderCards(words);
   if (mode === 'match-ru' || mode === 'match-pic') return startMatch(mode, words);
@@ -616,10 +661,11 @@ function answer(idx) {
       ${sayBtn(w)}
     </div>
     <div class="nextrow">
+      ${learnBox(w)}
       <span class="keys">Клавиши: 1–${item.opts.length} — ответ, Enter — дальше, R — повторить звук</span>
       <button class="btn primary" data-act="next">Дальше →</button>
     </div>`;
-  bindSay();
+  bindSay(); bindLearn();
   const ex = after.querySelector('[data-ex]');
   if (ex) ex.onclick = () => Speech.say({ ro: w.ex });
   after.querySelector('[data-act=next]').onclick = nextQuestion;
@@ -714,10 +760,11 @@ function renderMatch() {
 function matchBoard(words, kind) {
   const left = shuffle(words), right = shuffle(words);
   const html = `<div class="match">
-    <div class="col">${left.map((w, i) => `<button class="mi" data-side="L" data-i="${i}">${esc(w.ro)}</button>`).join('')}</div>
+    <div class="col">${left.map((w, i) => `<div class="lrow">${learnBox(w, false)}<button class="mi" data-side="L" data-i="${i}">${esc(w.ro)}</button></div>`).join('')}</div>
     <div class="col">${right.map((w, i) => `<button class="mi ${kind === 'pic' ? 'p' : ''}" data-side="R" data-i="${i}">${
       kind === 'pic' ? `<span class="pr">${picHTML(w, 'xs')}<span>${esc(w.ru)}</span></span>` : esc(w.ru)}</button>`).join('')}</div>
-  </div>`;
+  </div>
+  <div class="lhint">☑ слева — отметить слово как выученное: оно больше не будет попадаться в упражнениях</div>`;
   const bind = ({ onHit, onMiss, onDone }) => {
     const done = new Set();
     let sel = null;
@@ -751,14 +798,14 @@ function matchBoard(words, kind) {
 /* ================= cards ================= */
 let cardHide = LS.get('cardHide', 'none');   // 'none' | 'ru' | 'ro'
 
-function renderCards(words) {
+function renderCards(words, title = 'Карточки') {
   screen = 'cards';
   sayRegistry = [];
   const sorted = words.slice().sort((a, b) => selectedWords().indexOf(a) - selectedWords().indexOf(b));
   const tbtn = (v, label) => `<button class="btn small ${cardHide === v ? 'on' : ''}" data-hide="${v}">${label}</button>`;
   setHTML(`
     <div class="qbar"><button class="x" data-act="menu" title="В меню">✕</button>
-      <h1 style="font-size:20px;flex:1">Карточки · ${sorted.length}</h1></div>
+      <h1 style="font-size:20px;flex:1">${esc(title)} · ${sorted.length}</h1></div>
     <div class="toolbar">
       ${tbtn('none', 'Показать всё')}${tbtn('ru', 'Скрыть перевод')}${tbtn('ro', 'Скрыть румынский')}
       <span class="muted" style="font-size:13px;align-self:center">Нажмите на размытый текст, чтобы открыть</span>
@@ -766,21 +813,21 @@ function renderCards(words) {
     <div class="cards">
       ${sorted.map((w, i) => {
         const s = stats[w.key];
-        return `<div class="card">
+        return `<div class="card ${isLearned(w) ? 'learned' : ''}" data-key="${esc(w.key)}">
           ${picHTML(w)}
           <div class="cro"><span class="${cardHide === 'ro' ? 'hidden-txt' : ''}">${esc(w.ro)}
             ${w.tr ? `<span class="tr">[${esc(w.tr)}]</span>` : ''}</span>${sayBtn(w)}</div>
           <div class="cru ${cardHide === 'ru' ? 'hidden-txt' : ''}">${esc(w.ru)}</div>
           ${w.note ? `<div class="note ${cardHide === 'ru' ? 'hidden-txt' : ''}">${esc(w.note)}</div>` : ''}
           ${w.ex ? `<div class="ex" data-ex="${i}">🔊 ${esc(w.ex)}<br><span class="${cardHide === 'ru' ? 'hidden-txt' : ''}">${esc(w.exRu || '')}</span></div>` : ''}
-          ${s ? `<div class="st">✓ ${s.c} · ✗ ${s.w}</div>` : ''}
+          <div class="st">${learnBox(w)}${s ? ` · ✓ ${s.c} · ✗ ${s.w}` : ''}</div>
         </div>`;
       }).join('')}
     </div>
   `);
   app.querySelector('[data-act=menu]').onclick = renderHome;
   app.querySelectorAll('[data-hide]').forEach(b => b.onclick = () => {
-    cardHide = b.dataset.hide; LS.set('cardHide', cardHide); renderCards(words);
+    cardHide = b.dataset.hide; LS.set('cardHide', cardHide); renderCards(words, title);
   });
   app.querySelectorAll('.hidden-txt').forEach(el => el.onclick = e => { e.stopPropagation(); el.classList.remove('hidden-txt'); });
   app.querySelectorAll('[data-ex]').forEach(el => el.onclick = () => Speech.say({ ro: sorted[+el.dataset.ex].ex }));
@@ -824,7 +871,7 @@ function renderResults(r) {
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
   if (e.key === 'Escape' && screen !== 'home') { renderHome(); return; }
-  if (screen === 'home' && e.key === 'Enter' && e.target === document.body && selectedWords().length >= 2) {
+  if (screen === 'home' && e.key === 'Enter' && e.target === document.body && practiceWords().length >= 2) {
     startMode('mix', sessionWords()); return;
   }
   if (screen !== 'quiz') return;
