@@ -12,7 +12,7 @@
     --bad: #d33f3f; --bad-soft: #fde7e7; --warm: #c45a00; --warm-soft: #fff0e1;
     --cold: #1d6fb8; --cold-soft: #e3f1fc;
     --shadow: 0 1px 2px rgba(0,0,0,.04), 0 6px 18px rgba(20,30,60,.06);
-    --r: 14px;
+    --r: 14px; --on-blue: #ffffff;
     --emoji: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
   }
   @media (prefers-color-scheme: dark) {
@@ -20,7 +20,7 @@
       --bg: #10131a; --card: #1a1f2a; --text: #e8ebf2; --muted: #9aa3b5; --line: #2c3343;
       --blue: #86a8ff; --blue-soft: #1f2a45; --ok: #4fca86; --ok-soft: #16301f;
       --bad: #ff7d7d; --bad-soft: #3a1c21; --warm: #ffae63; --warm-soft: #3a2614;
-      --cold: #7cc0ff; --cold-soft: #15293d; --shadow: none;
+      --cold: #7cc0ff; --cold-soft: #15293d; --shadow: none; --on-blue: #0e1630;
     }
   }
   * { box-sizing: border-box; }
@@ -37,21 +37,37 @@
   h1 { font-size: 24px; margin: 0; }
   h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted);
     margin: 26px 0 10px; font-weight: 650; }
-  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
-  .chip { border: 1.5px solid var(--line); background: var(--card); padding: 8px 14px;
-    border-radius: 999px; display: inline-flex; gap: 8px; align-items: baseline; }
-  .chip.on { border-color: var(--blue); background: var(--blue-soft); }
-  .chip .sub { color: var(--muted); font-size: 14px; }
-  .chip .n { font-size: 12px; font-weight: 700; color: var(--blue); }
-  .modes { display: grid; grid-template-columns: repeat(auto-fill, minmax(185px, 1fr)); gap: 10px; }
-  .mode { background: var(--card); border: 1.5px solid var(--line); border-radius: var(--r);
-    padding: 14px; text-align: left; box-shadow: var(--shadow); transition: transform .08s, border-color .15s; }
-  .mode:hover { border-color: var(--blue); transform: translateY(-1px); }
-  .mode:disabled { opacity: .45; pointer-events: none; }
-  .mode .ic { font: 26px var(--emoji); }
-  .mode b { display: block; margin-top: 6px; }
-  .mode span { color: var(--muted); font-size: 13px; }
-  .modes .group { grid-column: 1 / -1; font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .panel { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+  .trow { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 16px; border: none;
+    border-bottom: 1px solid var(--line); background: none; text-align: left; }
+  .trow:last-child { border-bottom: none; }
+  .trow:hover { background: var(--blue-soft); }
+  .trow .cb { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--line); flex: none;
+    display: grid; place-items: center; font-size: 13px; font-weight: 700; color: var(--on-blue); }
+  .trow.on .cb, .trow.part .cb { background: var(--blue); border-color: var(--blue); }
+  .trow .nm { flex: 1; }
+  .trow .sub { color: var(--muted); font-size: 14px; margin-left: 6px; }
+  .trow .n { color: var(--muted); font-size: 14px; }
+  .trow.all { font-weight: 600; }
+  .start { width: 100%; display: flex; align-items: center; gap: 16px; margin-top: 16px; padding: 18px 20px;
+    border: none; border-radius: var(--r); background: var(--blue); color: var(--on-blue); text-align: left;
+    box-shadow: var(--shadow); }
+  .start:hover { filter: brightness(1.06); }
+  .start:disabled { opacity: .5; pointer-events: none; }
+  .start .ic { font: 34px var(--emoji); }
+  .start b { display: block; font-size: 20px; }
+  .start span { font-size: 14px; opacity: .85; }
+  .start .go { margin-left: auto; font-size: 26px; }
+  .modelist { padding: 4px 0 8px; }
+  .modelist .g { padding: 12px 16px 4px; font-size: 12px; font-weight: 650; text-transform: uppercase;
+    letter-spacing: .06em; color: var(--muted); }
+  .modelist .it { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; width: 100%;
+    padding: 7px 16px 7px 32px; border: none; background: none; text-align: left; }
+  .modelist .it:hover { background: var(--blue-soft); }
+  .modelist .it:disabled { opacity: .45; pointer-events: none; }
+  .modelist .it .ic { font: 15px var(--emoji); width: 20px; }
+  .modelist .it b { font-size: 15px; font-weight: 600; }
+  .modelist .it .d { color: var(--muted); font-size: 13px; }
   .settings { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px 18px;
     background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; }
   .set { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: var(--muted); }
@@ -65,7 +81,7 @@
   /* ---------- common buttons ---------- */
   .btn { border: 1.5px solid var(--line); background: var(--card); padding: 10px 18px; border-radius: 12px; }
   .btn:hover { border-color: var(--blue); }
-  .btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; font-weight: 600; }
+  .btn.primary { background: var(--blue); border-color: var(--blue); color: var(--on-blue); font-weight: 600; }
   .btn.small { padding: 6px 12px; font-size: 14px; }
   .spk { border: none; background: var(--blue-soft); color: var(--blue); width: 38px; height: 38px;
     border-radius: 50%; font: 18px var(--emoji); display: inline-grid; place-items: center; flex: none;
@@ -328,8 +344,6 @@ const MODES = [
   { group: 'Пары' },
   { id: 'match-ru', ic: '🧩', name: 'Слово — перевод', desc: 'Соединить пары из двух списков' },
   { id: 'match-pic', ic: '🧩', name: 'Слово — картинка', desc: 'Пары: слово и картинка с переводом' },
-  { group: 'Всё вместе' },
-  { id: 'mix', ic: '🎲', name: 'Микс', desc: 'Все типы вопросов вперемешку' },
 ];
 const PROMPTS = {
   'ro-ru': 'Выберите перевод',
@@ -357,18 +371,27 @@ function renderHome() {
     <div class="muted">Учим румынские слова: перевод, картинки, пары и произношение.</div>
 
     <h2>Темы</h2>
-    <div class="chips">
-      ${TOPICS.length > 1 ? `<button class="chip ${allOn ? 'on' : ''}" data-all>Все темы <span class="n">${ALL.length}</span></button>` : ''}
-      ${TOPICS.map(t => `<button class="chip ${selected.includes(t.id) ? 'on' : ''}" data-topic="${esc(t.id)}">
-        ${esc(t.name)} <span class="sub">${esc(t.ru || '')}</span> <span class="n">${t.words.length}</span></button>`).join('')}
+    <div class="panel">
+      ${TOPICS.length > 1 ? `<button class="trow all ${allOn ? 'on' : selected.length ? 'part' : ''}" data-all>
+        <span class="cb">${allOn ? '✓' : selected.length ? '–' : ''}</span>
+        <span class="nm">Все темы</span><span class="n">${ALL.length}</span></button>` : ''}
+      ${TOPICS.map(t => { const on = selected.includes(t.id); return `<button class="trow ${on ? 'on' : ''}" data-topic="${esc(t.id)}">
+        <span class="cb">${on ? '✓' : ''}</span>
+        <span class="nm">${esc(t.name)}<span class="sub">${esc(t.ru || '')}</span></span>
+        <span class="n">${t.words.length}</span></button>`; }).join('')}
     </div>
-    <p class="muted" style="font-size:14px">Выбрано слов: <b>${sel.length}</b></p>
 
-    <h2>Как учить</h2>
-    <div class="modes">
-      ${MODES.map(m => m.group ? `<div class="group">${m.group}</div>` :
-        `<button class="mode" data-mode="${m.id}" ${sel.length < 2 ? 'disabled' : ''}>
-          <div class="ic">${m.ic}</div><b>${m.name}</b><span>${m.desc}</span></button>`).join('')}
+    <button class="start" data-mode="mix" ${sel.length < 2 ? 'disabled' : ''}>
+      <span class="ic">🎲</span>
+      <span><b>Начать · Микс</b><span>${sel.length} слов · все задания вперемешку, включая пары</span></span>
+      <span class="go">→</span>
+    </button>
+
+    <h2>Другие режимы</h2>
+    <div class="panel modelist">
+      ${MODES.map(m => m.group ? `<div class="g">${m.group}</div>` :
+        `<button class="it" data-mode="${m.id}" ${sel.length < 2 ? 'disabled' : ''}>
+          <span class="ic">${m.ic}</span><b>${m.name}</b><span class="d">${m.desc}</span></button>`).join('')}
     </div>
 
     <h2>Настройки</h2>
@@ -396,7 +419,7 @@ function renderHome() {
   });
   const all = app.querySelector('[data-all]');
   if (all) all.onclick = () => {
-    selected = allOn ? [TOPICS[0].id] : TOPICS.map(t => t.id);
+    selected = allOn ? [] : TOPICS.map(t => t.id);
     LS.set('topics', selected); renderHome();
   };
   app.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => startMode(b.dataset.mode, sessionWords()));
@@ -447,11 +470,42 @@ function startMode(mode, words) {
 /* ================= quiz ================= */
 let Q = null;
 
+// Mix: after every 6 questions (and at the end) a pairs round reviews the words just asked.
+function buildMixQueue(words) {
+  const queue = [];
+  let since = [];
+  const addPairs = () => {
+    const kind = pickRandom(['ru', 'pic']);
+    const ws = pickPairs(since, kind, 5);
+    if (ws.length >= 3) queue.push({ type: 'match', words: ws, kind });
+    since = [];
+  };
+  words.forEach(w => {
+    queue.push({ w, type: mixType(w) });
+    since.push(w);
+    if (since.length === 6) addPairs();
+  });
+  if (since.length >= 3) addPairs();
+  return queue;
+}
+
+// Up to `max` words that can share one pairs board: no equal translations or synonyms,
+// and (with pictures) no look-alike pictures.
+function pickPairs(words, kind, max) {
+  const out = [];
+  for (const w of words) {
+    if (out.length === max) break;
+    if (out.some(x => x.ru === w.ru || sameSyn(x, w) || (kind === 'pic' && w.grp && x.grp === w.grp))) continue;
+    out.push(w);
+  }
+  return out;
+}
+
 function startQuiz(mode, words) {
   const pool = selectedWords();
   Q = {
     mode, words, pool,
-    queue: words.map(w => ({ w, type: mode === 'mix' ? mixType(w) : mode })),
+    queue: mode === 'mix' ? buildMixQueue(words) : words.map(w => ({ w, type: mode })),
     i: 0, ok: 0, bad: 0, firstOk: 0,
     seen: new Set(), mistakes: new Set(), retries: new Map(),
     answered: false, timer: null,
@@ -478,10 +532,22 @@ function topBar(progress, ok, bad) {
   </div>`;
 }
 
+function requeue(w, type) {
+  const r = Q.retries.get(w.key) || 0;
+  if (r >= 2) return;
+  Q.retries.set(w.key, r + 1);
+  const pos = Math.min(Q.queue.length, Q.i + 3 + (Math.random() * 3 | 0));
+  Q.queue.splice(pos, 0, { w, type: Q.mode === 'mix' ? mixType(w) : type });
+}
+const setScore = (ok, bad) => {
+  app.querySelector('.score').innerHTML = `<span class="o">✓ ${ok}</span><span class="b">✗ ${bad}</span>`;
+};
+
 function renderQuestion() {
   clearTimeout(Q.timer);
   sayRegistry = [];
   const item = Q.queue[Q.i];
+  if (item.type === 'match') return renderMixPairs(item);
   const { w, type } = item;
   item.opts = item.opts || buildOptions(w, type);
   Q.answered = false;
@@ -532,16 +598,8 @@ function answer(idx) {
   Q.seen.add(w.key);
   record(w, ok);
   if (ok) { Q.ok++; if (first) Q.firstOk++; }
-  else {
-    Q.bad++; Q.mistakes.add(w);
-    const r = Q.retries.get(w.key) || 0;
-    if (r < 2) {   // ask this word again a bit later
-      Q.retries.set(w.key, r + 1);
-      const pos = Math.min(Q.queue.length, Q.i + 3 + (Math.random() * 3 | 0));
-      Q.queue.splice(pos, 0, { w, type: Q.mode === 'mix' ? mixType(w) : type });
-    }
-  }
-  app.querySelector('.score').innerHTML = `<span class="o">✓ ${Q.ok}</span><span class="b">✗ ${Q.bad}</span>`;
+  else { Q.bad++; Q.mistakes.add(w); requeue(w, type); }   // ask this word again a bit later
+  setScore(Q.ok, Q.bad);
 
   if (settings.autoplay && (type === 'ru-ro' || type === 'pic-ro' || !ok)) Speech.say(w);
 
@@ -566,6 +624,33 @@ function answer(idx) {
   if (ex) ex.onclick = () => Speech.say({ ro: w.ex });
   after.querySelector('[data-act=next]').onclick = nextQuestion;
   if (ok && settings.autonext) Q.timer = setTimeout(nextQuestion, 1300);
+}
+
+function renderMixPairs(item) {
+  Q.answered = false;
+  const board = matchBoard(item.words, item.kind);
+  setHTML(`
+    ${topBar(Q.i / Q.queue.length, Q.ok, Q.bad)}
+    <div class="hint">Соедините пары</div>
+    ${board.html}
+  `);
+  app.querySelector('[data-act=menu]').onclick = renderHome;
+  const missed = new Set();
+  board.bind({
+    onHit(w) {
+      Q.ok++;
+      if (!missed.has(w)) record(w, true);
+      if (!Q.seen.has(w.key)) { Q.seen.add(w.key); if (!missed.has(w)) Q.firstOk++; }
+      setScore(Q.ok, Q.bad);
+    },
+    onMiss(w) {
+      Q.bad++;
+      if (!missed.has(w)) { record(w, false); requeue(w); }
+      missed.add(w); Q.mistakes.add(w); Q.seen.add(w.key);
+      setScore(Q.ok, Q.bad);
+    },
+    onDone() { Q.answered = true; Q.timer = setTimeout(nextQuestion, 600); },
+  });
 }
 
 function nextQuestion() {
@@ -601,56 +686,66 @@ function startMatch(mode, words) {
 function renderMatch() {
   sayRegistry = [];
   const ch = M.chunks[M.ci];
-  const left = shuffle(ch), right = shuffle(ch);
-  const done = new Set();
-  let sel = null;
   const progress = M.chunks.slice(0, M.ci).reduce((s, c) => s + c.length, 0) / M.words.length;
-
+  const board = matchBoard(ch, M.kind);
   setHTML(`
     ${topBar(progress, M.ok, M.bad)}
     <div class="hint">Соедините пары · раунд ${M.ci + 1} из ${M.chunks.length}</div>
-    <div class="match">
-      <div class="col">${left.map((w, i) => `<button class="mi" data-side="L" data-i="${i}">${esc(w.ro)}</button>`).join('')}</div>
-      <div class="col">${right.map((w, i) => `<button class="mi ${M.kind === 'pic' ? 'p' : ''}" data-side="R" data-i="${i}">${
-        M.kind === 'pic' ? `<span class="pr">${picHTML(w, 'xs')}<span>${esc(w.ru)}</span></span>` : esc(w.ru)}</button>`).join('')}</div>
-    </div>
+    ${board.html}
   `);
   app.querySelector('[data-act=menu]').onclick = renderHome;
-
-  app.querySelectorAll('.mi').forEach(el => el.onclick = () => {
-    const side = el.dataset.side;
-    const w = (side === 'L' ? left : right)[+el.dataset.i];
-    if (done.has(w)) return;
-    if (side === 'L' && settings.autoplay) Speech.say(w);
-    if (!sel || sel.side === side) {
-      if (sel) sel.el.classList.remove('sel');
-      sel = { side, el, w };
-      el.classList.add('sel');
-      return;
-    }
-    const a = sel; sel = null;
-    a.el.classList.remove('sel');
-    if (a.w === w) {
-      done.add(w);
-      a.el.classList.add('done'); el.classList.add('done');
-      M.ok++;
-      if (!M.mistakes.has(w)) record(w, true);
-      if (done.size === ch.length) setTimeout(() => {
+  board.bind({
+    onHit(w) { M.ok++; if (!M.mistakes.has(w)) record(w, true); setScore(M.ok, M.bad); },
+    onMiss(w) { M.bad++; if (!M.mistakes.has(w)) record(w, false); M.mistakes.add(w); setScore(M.ok, M.bad); },
+    onDone() {
+      setTimeout(() => {
         if (screen !== 'match') return;
         M.ci++;
         if (M.ci < M.chunks.length) renderMatch();
         else renderResults({ good: M.words.length - M.mistakes.size, total: M.words.length,
           mistakes: [...M.mistakes], unit: 'без ошибок' });
       }, 600);
-    } else {
-      M.bad++;
-      const lw = side === 'L' ? w : a.w;   // the Romanian word that was mismatched
-      if (!M.mistakes.has(lw)) record(lw, false);
-      M.mistakes.add(lw);
-      [a.el, el].forEach(e => { e.classList.add('wrong'); setTimeout(() => e.classList.remove('wrong'), 450); });
-    }
-    app.querySelector('.score').innerHTML = `<span class="o">✓ ${M.ok}</span><span class="b">✗ ${M.bad}</span>`;
+    },
   });
+}
+
+// Two-column pairs board. Returns its HTML and bind(callbacks) to call after it is in the page.
+// onMiss gets the Romanian word that was matched wrongly.
+function matchBoard(words, kind) {
+  const left = shuffle(words), right = shuffle(words);
+  const html = `<div class="match">
+    <div class="col">${left.map((w, i) => `<button class="mi" data-side="L" data-i="${i}">${esc(w.ro)}</button>`).join('')}</div>
+    <div class="col">${right.map((w, i) => `<button class="mi ${kind === 'pic' ? 'p' : ''}" data-side="R" data-i="${i}">${
+      kind === 'pic' ? `<span class="pr">${picHTML(w, 'xs')}<span>${esc(w.ru)}</span></span>` : esc(w.ru)}</button>`).join('')}</div>
+  </div>`;
+  const bind = ({ onHit, onMiss, onDone }) => {
+    const done = new Set();
+    let sel = null;
+    app.querySelectorAll('.mi').forEach(el => el.onclick = () => {
+      const side = el.dataset.side;
+      const w = (side === 'L' ? left : right)[+el.dataset.i];
+      if (done.has(w)) return;
+      if (side === 'L' && settings.autoplay) Speech.say(w);
+      if (!sel || sel.side === side) {
+        if (sel) sel.el.classList.remove('sel');
+        sel = { side, el, w };
+        el.classList.add('sel');
+        return;
+      }
+      const a = sel; sel = null;
+      a.el.classList.remove('sel');
+      if (a.w === w) {
+        done.add(w);
+        a.el.classList.add('done'); el.classList.add('done');
+        onHit(w);
+        if (done.size === words.length) onDone();
+      } else {
+        onMiss(side === 'L' ? w : a.w);
+        [a.el, el].forEach(e => { e.classList.add('wrong'); setTimeout(() => e.classList.remove('wrong'), 450); });
+      }
+    });
+  };
+  return { html, bind };
 }
 
 /* ================= cards ================= */
@@ -729,8 +824,12 @@ function renderResults(r) {
 document.addEventListener('keydown', e => {
   if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
   if (e.key === 'Escape' && screen !== 'home') { renderHome(); return; }
+  if (screen === 'home' && e.key === 'Enter' && e.target === document.body && selectedWords().length >= 2) {
+    startMode('mix', sessionWords()); return;
+  }
   if (screen !== 'quiz') return;
   const item = Q.queue[Q.i];
+  if (item.type === 'match') return;
   if (/^[1-9]$/.test(e.key) && !Q.answered) { answer(+e.key - 1); e.preventDefault(); }
   else if ((e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight') && Q.answered) { nextQuestion(); e.preventDefault(); }
   else if (e.code === 'KeyR') Speech.say(item.w);
