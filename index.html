@@ -210,6 +210,7 @@
 <div class="toast" id="toast"></div>
 
 <script src="words.js"></script>
+<script src="audio/index.js"></script>
 <script>
 'use strict';
 
@@ -291,6 +292,9 @@ const Speech = {
     speechSynthesis.speak(u);
   },
   google(text) {
+    // saved recording (tools/make-audio.mjs) if there is one, otherwise ask Google online
+    const saved = (window.AUDIO || {})[text];
+    if (saved) { this.playUrl(saved, text, settings.rate); return; }
     const url = 'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=ro&q=' + encodeURIComponent(text);
     this.playUrl(url, text, settings.rate);
   },
@@ -305,7 +309,9 @@ const Speech = {
         const u = new SpeechSynthesisUtterance(text); u.lang = 'ro-RO'; u.rate = settings.rate;
         speechSynthesis.speak(u);
       }
-      toast('Не удалось загрузить звук. Нужен интернет или румынский голос в системе (см. настройки).');
+      toast(/^https?:/.test(url)
+        ? 'Для этого текста нет сохранённой записи, а загрузить звук из интернета не удалось.'
+        : 'Не удалось воспроизвести запись ' + url);
     });
   },
 };
@@ -485,10 +491,10 @@ function renderVoiceUI() {
   const o = (v, label) => `<option value="${esc(v)}" ${settings.voice === v ? 'selected' : ''}>${esc(label)}</option>`;
   const gender = v => Speech.isFemale(v) ? '♀ ' : Speech.isMale(v) ? '♂ ' : '';
   sel.innerHTML = o('auto', 'Авто (женский)') + Speech.voices.map(v => o(v.name, gender(v) + v.name)).join('')
-    + o('google', '♀ Google Translate (онлайн)');
+    + o('google', '♀ Google (сохранённые записи)');
   const e = Speech.engine();
   info.textContent = e === 'google'
-    ? 'Голос: Google Translate, женский (нужен интернет). Самый естественный женский голос — «Alina (Natural)» в браузере Microsoft Edge.'
+    ? 'Голос: Google, женский — записи всех слов сохранены в папке audio, интернет не нужен. Самый естественный женский голос — «Alina (Natural)» в браузере Microsoft Edge.'
     : 'Голос: ' + gender(e) + e.name;
 }
 
