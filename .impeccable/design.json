@@ -1,0 +1,164 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-11T12:00:00Z",
+  "title": "Design System: Învățăm cuvinte",
+  "extensions": {
+    "colorMeta": {
+      "rail": { "role": "primary", "displayName": "Sea-Teal Rail", "canonical": "#0e4f55", "tonalRamp": ["#05262a", "#0a3e43", "#0e4f55", "#2a6e73", "#4f8f93", "#7fb3b5", "#b5d6d7", "#e3f1f1"] },
+      "rail-deep": { "role": "primary", "displayName": "Rail Deep", "canonical": "#0a3e43" },
+      "teal": { "role": "primary", "displayName": "Stamp Teal", "canonical": "#155e63", "tonalRamp": ["#082c2f", "#0e4246", "#155e63", "#2f7b80", "#5fb3ad", "#93cfc9", "#bfe6dc", "#dcf0eb"] },
+      "teal-soft": { "role": "primary", "displayName": "Teal Wash", "canonical": "#dcf0eb" },
+      "teal-ring": { "role": "primary", "displayName": "Focus Teal", "canonical": "#5fb3ad" },
+      "brick": { "role": "secondary", "displayName": "Teacher's Brick", "canonical": "#c0412a", "tonalRamp": ["#4a170e", "#7a2717", "#a03421", "#c0412a", "#d86c55", "#eb9e8b", "#f6c9bd", "#fbe7e1"] },
+      "brick-soft": { "role": "secondary", "displayName": "Brick Wash", "canonical": "#fbe7e1" },
+      "lavender": { "role": "tertiary", "displayName": "Lavender Crayon", "canonical": "#cbb8f0", "tonalRamp": ["#2e2150", "#4a3880", "#6c56b0", "#9580d6", "#b3a0e6", "#cbb8f0", "#e2d8f7", "#f3eefc"] },
+      "apricot": { "role": "tertiary", "displayName": "Apricot Crayon", "canonical": "#ffc8a2", "tonalRamp": ["#4d2408", "#7f3d12", "#b05c22", "#e0844a", "#f6a97a", "#ffc8a2", "#ffdec7", "#fff1e6"] },
+      "pistachio": { "role": "tertiary", "displayName": "Pistachio Crayon", "canonical": "#cfe8a9", "tonalRamp": ["#26360f", "#3d5719", "#5a7d2a", "#7fa346", "#a7c977", "#cfe8a9", "#e2f1cb", "#f2f9e8"] },
+      "lemon": { "role": "tertiary", "displayName": "Lemon Crayon", "canonical": "#fff1a8", "tonalRamp": ["#433a05", "#6e600c", "#9c8a18", "#cbb631", "#ecd968", "#fff1a8", "#fff6c9", "#fffbe8"] },
+      "lime": { "role": "tertiary", "displayName": "Lime Crayon", "canonical": "#e4f09b", "tonalRamp": ["#373d0a", "#5a6415", "#808e22", "#a8b83c", "#cbdc6b", "#e4f09b", "#eff6c4", "#f8fbe5"] },
+      "mint": { "role": "tertiary", "displayName": "Mint Crayon", "canonical": "#bfe6dc", "tonalRamp": ["#123a32", "#1f5a4e", "#33806f", "#5aa694", "#8ccbbb", "#bfe6dc", "#d9f1ea", "#eef9f6"] },
+      "page": { "role": "neutral", "displayName": "Mint-White Page", "canonical": "#f4fbf9" },
+      "paper": { "role": "neutral", "displayName": "Paper", "canonical": "#ffffff" },
+      "ink": { "role": "neutral", "displayName": "Primer Ink", "canonical": "#14262b", "tonalRamp": ["#14262b", "#2a3e43", "#3d4f53", "#52676b", "#7d9094", "#a9bbbd", "#d8e9e5", "#f4fbf9"] },
+      "muted": { "role": "neutral", "displayName": "Slate Muted", "canonical": "#52676b" },
+      "line": { "role": "neutral", "displayName": "Hairline", "canonical": "#d8e9e5" },
+      "line-strong": { "role": "neutral", "displayName": "Strong Hairline", "canonical": "#b9d5cf" },
+      "rail-muted": { "role": "neutral", "displayName": "Rail Muted", "canonical": "rgba(255,255,255,.74)" },
+      "rail-line": { "role": "neutral", "displayName": "Rail Line", "canonical": "rgba(255,255,255,.14)" }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Primer Word", "purpose": "The Romanian word on the plate only; steps 112/92/74/60/46px by length, x0.62 on phones." },
+      "grade": { "displayName": "Grade", "purpose": "Calificativ name on results; rail session count at 54px." },
+      "headline": { "displayName": "Headline", "purpose": "Home page heading; meaning line at Rubik 500 30px." },
+      "title": { "displayName": "Title", "purpose": "Card word, start-button label, session mode, section headings." },
+      "option": { "displayName": "Option", "purpose": "Answer options; Romanian options switch to Rubik 600." },
+      "body": { "displayName": "Body", "purpose": "Russian interface text." },
+      "label": { "displayName": "Group Label", "purpose": "Uppercase tracked label naming a group of controls only; never above a heading." }
+    },
+    "shadows": [
+      { "name": "teal-lift", "value": "0 6px 18px -8px rgba(14, 79, 85, .35)", "purpose": "Hover and selected state only, paired with translateY(-2px or -3px). Nothing casts a shadow at rest." },
+      { "name": "stamp-ring", "value": "inset 0 0 0 3px #ffffff, inset 0 0 0 5px currentColor", "purpose": "Draws the stamp's inner ring; a shape device, not elevation." }
+    ],
+    "motion": [
+      { "name": "ease", "value": "cubic-bezier(.16, 1, .3, 1)", "purpose": "All lifts, progress fill, stamp landing and emoji rise." },
+      { "name": "stamp-land", "value": "420ms: rotate(-26deg) scale(1.7), opacity 0 -> rotate(-12deg) scale(1)", "purpose": "The stamp lands once on an answer or grade." },
+      { "name": "rise", "value": "500ms: translateY(12px) scale(.9), opacity 0 -> rest", "purpose": "Question emoji enters." },
+      { "name": "shake", "value": "350ms +/-5px", "purpose": "Mismatched pair item." },
+      { "name": "reduced-motion", "value": "all animation and transition off", "purpose": "prefers-reduced-motion: reduce." }
+    ],
+    "breakpoints": [
+      { "name": "narrow-desktop", "value": "1080px" },
+      { "name": "phone", "value": "820px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Start Button",
+      "kind": "button",
+      "refersTo": "button-start",
+      "description": "The single primary action on home: teal band that starts the Mix session (Enter).",
+      "html": "<button class=\"ds-start\"><svg viewBox=\"0 0 24 24\" width=\"34\" height=\"34\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5\"/></svg><span><b>Начать · Микс</b><span>Все задания вперемешку, включая пары</span></span><svg class=\"ds-go\" viewBox=\"0 0 24 24\" width=\"34\" height=\"34\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14M13 6l6 6-6 6\"/></svg></button>",
+      "css": ".ds-start { display: flex; align-items: center; gap: 18px; width: 100%; max-width: 640px; padding: 20px 26px; border: none; border-radius: 20px; background: var(--rail, #0e4f55); color: #fff; text-align: left; cursor: pointer; font-family: 'Golos Text', system-ui, sans-serif; transition: transform .25s cubic-bezier(.16,1,.3,1), box-shadow .25s, background .2s; } .ds-start b { display: block; font: 700 25px/1.15 'Rubik', system-ui, sans-serif; } .ds-start span span { display: block; font-size: 15px; color: rgba(255,255,255,.82); } .ds-start .ds-go { margin-left: auto; } .ds-start:hover { background: var(--rail-deep, #0a3e43); transform: translateY(-2px); box-shadow: 0 6px 18px -8px rgba(14,79,85,.35); } .ds-start:focus-visible { outline: 3px solid #5fb3ad; outline-offset: 2px; }"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Teal action button (Дальше, Повторить ошибки).",
+      "html": "<button class=\"ds-btn ds-btn-primary\">Дальше</button>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px; border-radius: 12px; border: 1.5px solid var(--line-strong, #b9d5cf); background: var(--paper, #fff); color: var(--ink, #14262b); font: 600 16px 'Golos Text', system-ui, sans-serif; cursor: pointer; transition: border-color .15s, background .15s; } .ds-btn-primary { background: var(--rail, #0e4f55); border-color: var(--rail, #0e4f55); color: #fff; } .ds-btn-primary:hover { background: var(--rail-deep, #0a3e43); } .ds-btn:focus-visible { outline: 3px solid #5fb3ad; outline-offset: 2px; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Paper button with strong hairline (Ещё раз, В меню).",
+      "html": "<button class=\"ds-btn2\">Ещё раз</button>",
+      "css": ".ds-btn2 { display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px; border-radius: 12px; border: 1.5px solid var(--line-strong, #b9d5cf); background: var(--paper, #fff); color: var(--ink, #14262b); font: 600 16px 'Golos Text', system-ui, sans-serif; cursor: pointer; transition: border-color .15s; } .ds-btn2:hover { border-color: var(--rail, #0e4f55); } .ds-btn2:focus-visible { outline: 3px solid #5fb3ad; outline-offset: 2px; }"
+    },
+    {
+      "name": "Mode Chip",
+      "kind": "chip",
+      "refersTo": "chip-mode",
+      "description": "Crayon chip for a mode; fill is the mode group's crayon.",
+      "html": "<button class=\"ds-chip\" style=\"--c:#ffc8a2\"><b>RO → RU</b><span>Выбрать перевод слова</span></button>",
+      "css": ".ds-chip { display: block; width: 240px; text-align: left; padding: 10px 14px; border: none; border-radius: 12px; background: var(--c, #cbb8f0); color: #14262b; font-family: 'Golos Text', system-ui, sans-serif; cursor: pointer; transition: transform .2s cubic-bezier(.16,1,.3,1), box-shadow .2s; } .ds-chip b { display: block; font-weight: 600; } .ds-chip span { display: block; font-size: 13px; color: #3d4f53; line-height: 1.35; } .ds-chip:hover { transform: translateY(-2px); box-shadow: 0 6px 18px -8px rgba(14,79,85,.35); } .ds-chip:focus-visible { outline: 3px solid #5fb3ad; outline-offset: 2px; }"
+    },
+    {
+      "name": "Answer Option",
+      "kind": "custom",
+      "refersTo": "option",
+      "description": "Quiz option with key badge; right/wrong states carry the teacher's stamp.",
+      "html": "<div style=\"display:grid;gap:12px;grid-template-columns:1fr 1fr;max-width:760px\"><button class=\"ds-opt\"><span class=\"ds-k\">1</span>дождь</button><button class=\"ds-opt ds-right\"><span class=\"ds-k\">2</span>холодно<span class=\"ds-stamp\"><svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12l5 5 9-10\"/></svg></span></button><button class=\"ds-opt ds-wrong\"><span class=\"ds-k\">3</span>жарко<span class=\"ds-stamp ds-bad\"><svg viewBox=\"0 0 24 24\" width=\"18\" height=\"18\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3.2\" stroke-linecap=\"round\"><path d=\"M6 6l12 12M18 6 6 18\"/></svg></span></button><button class=\"ds-opt ds-dim\"><span class=\"ds-k\">4</span>гроза</button></div>",
+      "css": ".ds-opt { position: relative; display: flex; align-items: center; gap: 14px; min-height: 76px; padding: 14px 70px 14px 16px; border: 2px solid #d8e9e5; border-radius: 16px; background: #fff; color: #14262b; text-align: left; font: 500 21px/1.25 'Golos Text', system-ui, sans-serif; cursor: pointer; transition: transform .2s cubic-bezier(.16,1,.3,1), box-shadow .2s, border-color .15s; } .ds-opt:hover { border-color: #0e4f55; transform: translateY(-2px); box-shadow: 0 6px 18px -8px rgba(14,79,85,.35); } .ds-opt:focus-visible { outline: 3px solid #5fb3ad; outline-offset: 2px; } .ds-k { flex: none; width: 30px; height: 30px; border-radius: 9px; background: #f4fbf9; border: 1.5px solid #d8e9e5; display: grid; place-items: center; font: 600 14px 'Golos Text', system-ui, sans-serif; color: #52676b; } .ds-right { border-color: #155e63; background: #dcf0eb; } .ds-wrong { border-color: #c0412a; background: #fbe7e1; } .ds-dim { opacity: .42; } .ds-stamp { position: absolute; right: 14px; top: 50%; margin-top: -20px; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; border: 2px solid currentColor; box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 3.5px currentColor; transform: rotate(-12deg); color: #155e63; } .ds-stamp.ds-bad { color: #c0412a; }"
+    },
+    {
+      "name": "Teacher's Stamp",
+      "kind": "custom",
+      "refersTo": "stamp",
+      "description": "Signature: rotated double-ring stamp; teal for correct and FB/B, brick for wrong and S/I.",
+      "html": "<div style=\"display:flex;gap:28px;align-items:center\"><span class=\"ds-mark\">FB</span><span class=\"ds-mark ds-mark-bad\">I</span></div>",
+      "css": ".ds-mark { display: inline-grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; border: 3px solid currentColor; box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 5px currentColor; font: 800 22px/1 'Rubik', system-ui, sans-serif; letter-spacing: -.02em; transform: rotate(-12deg); color: #155e63; animation: ds-stamp .42s cubic-bezier(.16,1,.3,1) both; } .ds-mark-bad { color: #c0412a; } @keyframes ds-stamp { from { transform: rotate(-26deg) scale(1.7); opacity: 0; } 60% { opacity: 1; } to { transform: rotate(-12deg) scale(1); } } @media (prefers-reduced-motion: reduce) { .ds-mark { animation: none; } }"
+    },
+    {
+      "name": "Primer Plate",
+      "kind": "custom",
+      "refersTo": "letter-tile",
+      "description": "Signature: crayon letter tile and the Romanian word at primer scale between a 4px ink rule and a hairline.",
+      "html": "<div class=\"ds-plate\"><div class=\"ds-tile\">Pp</div><div><div class=\"ds-word\">ploaie</div><div class=\"ds-meta\">[плоайе] · Ploaia a încetat.</div><div class=\"ds-mean\">дождь</div></div></div>",
+      "css": ".ds-plate { display: grid; grid-template-columns: 176px minmax(0,1fr); gap: 40px; align-items: center; border-top: 4px solid #14262b; border-bottom: 1px solid #d8e9e5; padding: 32px 0; background: #f4fbf9; color: #14262b; } .ds-tile { width: 176px; height: 176px; border-radius: 24px; display: grid; place-items: center; font: 800 116px/1 'Rubik', system-ui, sans-serif; letter-spacing: -.04em; color: #0e4f55; background: #cbb8f0; } .ds-word { font: 800 112px/1.02 'Rubik', system-ui, sans-serif; letter-spacing: -.03em; } .ds-meta { margin-top: 14px; color: #52676b; font: 18px 'Golos Text', system-ui, sans-serif; } .ds-mean { margin-top: 6px; font: 500 30px/1.25 'Rubik', system-ui, sans-serif; }"
+    },
+    {
+      "name": "Word Card",
+      "kind": "card",
+      "refersTo": "word-card",
+      "description": "Cards mode: crayon top in the topic colour, paper body.",
+      "html": "<article class=\"ds-card\" style=\"--c:#cfe8a9\"><div class=\"ds-top\">🌧️</div><div class=\"ds-body\"><div class=\"ds-cro\">ploaie</div><div class=\"ds-cru\">дождь</div><div class=\"ds-note\">[плоайе]</div></div></article>",
+      "css": ".ds-card { width: 240px; background: #fff; border: 1px solid #d8e9e5; border-radius: 24px; overflow: hidden; display: flex; flex-direction: column; color: #14262b; font-family: 'Golos Text', system-ui, sans-serif; } .ds-top { background: var(--c, #cbb8f0); min-height: 104px; display: grid; place-items: center; padding: 14px; font: 60px/1 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif; } .ds-body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 4px; } .ds-cro { font: 700 22px/1.2 'Rubik', system-ui, sans-serif; } .ds-cru { font-size: 16px; } .ds-note { font-size: 13px; color: #52676b; }"
+    },
+    {
+      "name": "Topic Rail",
+      "kind": "nav",
+      "refersTo": "rail",
+      "description": "Teal rail with brand and topic checklist; Lemon checkbox when on.",
+      "html": "<nav class=\"ds-rail\"><b class=\"ds-brand\">Învățăm cuvinte</b><div class=\"ds-lbl\">Темы</div><button class=\"ds-trow ds-on\"><span class=\"ds-cb\"><svg viewBox=\"0 0 24 24\" width=\"14\" height=\"14\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12l5 5 9-10\"/></svg></span><span class=\"ds-nm\">De bază<small>Основное</small></span><span class=\"ds-n\">55</span></button><button class=\"ds-trow\"><span class=\"ds-cb\"></span><span class=\"ds-nm\">Întrebări<small>Вопросы</small></span><span class=\"ds-n\">16</span></button></nav>",
+      "css": ".ds-rail { width: 300px; background: #0e4f55; color: #fff; padding: 32px 22px 24px; display: flex; flex-direction: column; gap: 6px; font-family: 'Golos Text', system-ui, sans-serif; } .ds-brand { font: 800 27px/1.02 'Rubik', system-ui, sans-serif; margin-bottom: 20px; } .ds-lbl { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,.74); margin: 0 0 8px 10px; } .ds-trow { display: flex; align-items: center; gap: 12px; width: 100%; padding: 9px 10px; border: none; border-radius: 12px; background: none; color: inherit; text-align: left; font: inherit; cursor: pointer; transition: background .15s; } .ds-trow:hover { background: rgba(255,255,255,.08); } .ds-trow.ds-on { background: rgba(255,255,255,.13); } .ds-trow:focus-visible { outline: 3px solid #fff1a8; outline-offset: 2px; } .ds-cb { width: 20px; height: 20px; border-radius: 6px; border: 2px solid rgba(255,255,255,.6); display: grid; place-items: center; color: #14262b; font-size: 12px; font-weight: 800; flex: none; } .ds-on .ds-cb { background: #fff1a8; border-color: #fff1a8; } .ds-nm { flex: 1; line-height: 1.25; } .ds-nm small { display: block; font-size: 12.5px; color: rgba(255,255,255,.74); } .ds-n { font-size: 13px; color: rgba(255,255,255,.74); font-variant-numeric: tabular-nums; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Abecedar Page",
+    "overview": "Each Romanian word gets a page of its own, set like a school primer (abecedar). A crayon letter tile holds the word's initial (\"Pp\"), the word sits beside it at primer scale in heavy rounded letterforms, the emoji picture stands on the right, and a teacher's stamp marks every answer. A deep sea-teal rail runs down the left like the spine of a school book. It holds the topics and the session tally, so the page itself stays quiet.\n\nThe world is flat and calm. The page is mint-white, the colour comes from flat crayon fills, and surfaces only lift when the pointer is over them. The palette is teal with green and yellow pastels. The user chose to leave out pink. Brick red belongs to the teacher's pen and is used only for mistakes. Density is low: one word, one question and one set of options per view, and the frame never moves between questions.\n\nIt rejects the category default: a grey flashcard centred on a blank screen with a green progress bar.",
+    "keyCharacteristics": [
+      "A deep teal rail (300px) beside a mint-white page, never the other way round.",
+      "One Romanian word per page, set in Rubik 800 at primer scale.",
+      "Crayon pastel fills that carry meaning (topic, question type, mode group). They are never decoration.",
+      "A rotated double-ring teacher's stamp: teal for correct, brick for wrong, and a Romanian calificativ (FB / B / S / I) on results.",
+      "Flat at rest. A soft teal lift appears only on hover and selection."
+    ],
+    "rules": [
+      { "name": "The Crayon Is a Code Rule", "body": "A crayon fill always tells you something: which topic a word belongs to, which kind of question this is, or which mode group a chip is in. A new surface may not use a crayon only to look cheerful.", "section": "colors" },
+      { "name": "The Teacher's Pen Rule", "body": "Brick appears only where the teacher would mark in red: a wrong answer, a wrong stamp or a failing grade. It is never used for a call to action, a heading or decoration.", "section": "colors" },
+      { "name": "The No Pink Rule", "body": "The pastel family is green and yellow (pistachio, lime, lemon, mint) with lavender and apricot. Rose and raspberry are out by the user's choice.", "section": "colors" },
+      { "name": "The Primer Word Rule", "body": "On any page that shows a word, the Romanian word is the largest text on screen, set in Rubik 800. Nothing else uses Display.", "section": "typography" },
+      { "name": "The Two Voices Rule", "body": "Romanian goes in Rubik and Russian interface text goes in Golos Text. A Romanian word inside Russian prose (answer panel, mistake rows) switches to Rubik 700.", "section": "typography" },
+      { "name": "The Still Frame Rule", "body": "Every question type shares one plate, one scale and one baseline. Only the tile and the text change. Reserve heights (the plate's min-height and the answer panel's) so the frame does not shift between questions or when the answer appears.", "section": "layout" },
+      { "name": "The Flat at Rest Rule", "body": "No surface casts a shadow at rest. The lift is a response to the pointer or to a selection, and the option under the pointer lifts while answered options dim to 42%.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do give every word page the plate: crayon letter tile, Rubik 800 word, emoji, between a 4px ink rule and a hairline.",
+      "Do mark answers with the rotated teacher's stamp and keep it on the option. Teal means right, Brick means wrong.",
+      "Do pick crayon fills by meaning: the topic rotation lavender, apricot, pistachio, lemon, mint, lime, and the question types RU = Apricot, picture = Pistachio, listening = Lemon.",
+      "Do keep one teal primary action per screen and let Enter trigger it.",
+      "Do reserve the heights of the plate and answer panel so the frame never moves between questions.",
+      "Do honour reduced motion. The only motions are the stamp landing, the emoji rising, the pair mismatch shake and the hover lift."
+    ],
+    "donts": [
+      "Don't show the word as a grey flashcard centred on a blank screen with a green progress bar.",
+      "Don't use pink, rose or raspberry anywhere.",
+      "Don't use Brick for anything except mistakes and failing grades.",
+      "Don't add shadows to surfaces at rest. The Teal Lift is for hover and selection only.",
+      "Don't put an uppercase label above a heading. The tracked uppercase label only names a group of controls.",
+      "Don't use a crayon fill that doesn't encode a topic, question type or mode group."
+    ]
+  }
+}

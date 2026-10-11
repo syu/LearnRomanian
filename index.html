@@ -4,210 +4,346 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="referrer" content="no-referrer"><!-- Google TTS refuses requests that carry a Referer -->
-<title>Învățăm română</title>
+<meta name="color-scheme" content="light">
+<title>Învățăm cuvinte</title>
+<link rel="stylesheet" href="fonts/fonts.css">
 <style>
   :root {
-    --bg: #f5f6fa; --card: #ffffff; --text: #1c2333; --muted: #6a7286; --line: #e2e5ee;
-    --blue: #1f4fbf; --blue-soft: #e9effd; --ok: #1d9a52; --ok-soft: #e2f5e9;
-    --bad: #d33f3f; --bad-soft: #fde7e7; --warm: #c45a00; --warm-soft: #fff0e1;
-    --cold: #1d6fb8; --cold-soft: #e3f1fc;
-    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 6px 18px rgba(20,30,60,.06);
-    --r: 14px; --on-blue: #ffffff;
+    --rail: #0e4f55; --rail-deep: #0a3e43; --rail-line: rgba(255,255,255,.14);
+    --rail-ink: #ffffff; --rail-muted: rgba(255,255,255,.74);
+    --page: #f4fbf9; --paper: #ffffff; --ink: #14262b; --muted: #52676b;
+    --line: #d8e9e5; --line-strong: #b9d5cf;
+    --teal: #155e63; --teal-soft: #dcf0eb; --teal-ring: #5fb3ad;
+    --brick: #c0412a; --brick-soft: #fbe7e1;
+    --lavender: #cbb8f0; --apricot: #ffc8a2; --pistachio: #cfe8a9; --lemon: #fff1a8; --lime: #e4f09b; --mint: #bfe6dc;
+    --word: "Rubik", system-ui, sans-serif;
+    --ui: "Golos Text", system-ui, sans-serif;
     --emoji: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #10131a; --card: #1a1f2a; --text: #e8ebf2; --muted: #9aa3b5; --line: #2c3343;
-      --blue: #86a8ff; --blue-soft: #1f2a45; --ok: #4fca86; --ok-soft: #16301f;
-      --bad: #ff7d7d; --bad-soft: #3a1c21; --warm: #ffae63; --warm-soft: #3a2614;
-      --cold: #7cc0ff; --cold-soft: #15293d; --shadow: none; --on-blue: #0e1630;
-    }
+    --r-sm: 10px; --r: 16px; --r-lg: 24px;
+    --lift: 0 6px 18px -8px rgba(14, 79, 85, .35);
+    --ease: cubic-bezier(.16, 1, .3, 1);
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--text);
-    font: 16px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  button { font: inherit; color: inherit; cursor: pointer; }
-  .wrap { max-width: 860px; margin: 0 auto; padding: 16px 16px 48px; }
-  .muted { color: var(--muted); }
+  html { scrollbar-color: var(--line-strong) transparent; }
+  body { margin: 0; background: var(--page); color: var(--ink); font: 16px/1.5 var(--ui);
+    -webkit-font-smoothing: antialiased; }
+  ::selection { background: var(--lemon); color: var(--ink); }
+  button, select, input { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--teal-ring); outline-offset: 2px; border-radius: 6px; }
+  kbd { font: 600 12px var(--ui); padding: 1px 6px; border-radius: 6px; border: 1px solid currentColor; opacity: .9; }
+  .ico { width: 1.2em; height: 1.2em; fill: none; stroke: currentColor; stroke-width: 2.2;
+    stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+  /* ---------- shell ---------- */
+  .shell { display: grid; grid-template-columns: 300px minmax(0, 1fr); min-height: 100vh; }
+  .rail { background: var(--rail); color: var(--rail-ink); padding: 32px 22px 24px; display: flex;
+    flex-direction: column; gap: 26px; position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    scrollbar-color: rgba(255,255,255,.25) transparent; }
+  .rail :focus-visible { outline-color: var(--lemon); }
+  .brand { display: block; border: none; background: none; padding: 0; text-align: left; color: inherit; }
+  .brand b { display: block; font: 800 27px/1.02 var(--word); letter-spacing: -.01em; }
+  .brand small { display: block; margin-top: 8px; font-size: 13px; color: var(--rail-muted); }
+  .rail .label { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+    color: var(--rail-muted); margin: 0 0 8px 10px; }
+  .rail-foot { margin-top: auto; display: flex; flex-direction: column; gap: 10px; }
+  .rbtn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 11px 14px;
+    border-radius: var(--r-sm); border: 1.5px solid var(--rail-line); background: transparent; color: var(--rail-ink);
+    font-weight: 600; transition: background .2s, border-color .2s; }
+  .rbtn:hover { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.4); }
+  .rbtn.on { background: var(--lemon); border-color: var(--lemon); color: var(--ink); }
+  .rnote { font-size: 13px; color: var(--rail-muted); line-height: 1.45; padding: 0 4px; }
+
+  .topics { display: flex; flex-direction: column; gap: 2px; }
+  .trow { display: flex; align-items: center; gap: 12px; width: 100%; padding: 9px 10px; border: none;
+    border-radius: 12px; background: none; color: inherit; text-align: left; transition: background .15s; }
+  .trow:hover { background: rgba(255,255,255,.08); }
+  .trow.on { background: rgba(255,255,255,.13); }
+  .cb { width: 20px; height: 20px; border-radius: 6px; border: 2px solid rgba(255,255,255,.6); flex: none;
+    display: grid; place-items: center; color: var(--ink); }
+  .cb .ico { width: 14px; height: 14px; stroke-width: 3; }
+  .trow.on .cb, .trow.part .cb { background: var(--lemon); border-color: var(--lemon); }
+  .trow .nm { flex: 1; min-width: 0; line-height: 1.25; }
+  .trow .nm small { display: block; font-size: 12.5px; color: var(--rail-muted); }
+  .trow .n { font-size: 13px; color: var(--rail-muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .trow .lk { color: var(--pistachio); margin-right: 8px; display: inline-flex; align-items: center; gap: 2px; }
+  .trow .lk .ico { width: 13px; height: 13px; stroke-width: 3; }
+  .trow.all { font-weight: 600; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+
+  .session .mode { font: 700 22px/1.15 var(--word); }
+  .session .count { font: 800 54px/1 var(--word); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .session .count small { font-size: 22px; font-weight: 600; color: var(--rail-muted); }
+  .rprog { height: 8px; border-radius: 99px; background: var(--rail-deep); overflow: hidden; margin-top: 12px; }
+  .rprog i { display: block; height: 100%; background: var(--lemon); border-radius: 99px; transition: width .5s var(--ease); }
+  .tally { display: grid; gap: 8px; }
+  .tally div { display: flex; align-items: baseline; gap: 10px; background: var(--rail-deep); border-radius: 12px; padding: 9px 14px; }
+  .tally b { font: 800 26px/1.1 var(--word); font-variant-numeric: tabular-nums; min-width: 1.4em; }
+  .tally span { font-size: 13px; color: var(--rail-muted); }
+  .tally .okn b { color: var(--pistachio); } .tally .badn b { color: var(--apricot); }
+  .keys { font-size: 13px; color: var(--rail-muted); display: grid; grid-template-columns: auto 1fr; gap: 6px 10px; align-items: center; }
+  .keys kbd { justify-self: start; }
+
+  .page { padding: 40px clamp(24px, 4.5vw, 72px) 56px; min-width: 0; max-width: 1240px; width: 100%; }
 
   /* ---------- home ---------- */
-  .top { display: flex; align-items: center; gap: 12px; margin: 8px 0 8px; }
-  .flag { display: inline-flex; width: 30px; height: 20px; border-radius: 3px; overflow: hidden; flex: none; }
-  .flag i { flex: 1; }
-  h1 { font-size: 24px; margin: 0; }
-  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted);
-    margin: 26px 0 10px; font-weight: 650; }
-  .panel { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
-  .trow { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 16px; border: none;
-    border-bottom: 1px solid var(--line); background: none; text-align: left; }
-  .trow:last-child { border-bottom: none; }
-  .trow:hover { background: var(--blue-soft); }
-  .trow .cb { width: 20px; height: 20px; border-radius: 6px; border: 2px solid var(--line); flex: none;
-    display: grid; place-items: center; font-size: 13px; font-weight: 700; color: var(--on-blue); }
-  .trow.on .cb, .trow.part .cb { background: var(--blue); border-color: var(--blue); }
-  .trow .nm { flex: 1; }
-  .trow .sub { color: var(--muted); font-size: 14px; margin-left: 6px; }
-  .trow .n { color: var(--muted); font-size: 14px; }
-  .trow.all { font-weight: 600; }
-  .start { width: 100%; display: flex; align-items: center; gap: 16px; margin-top: 16px; padding: 18px 20px;
-    border: none; border-radius: var(--r); background: var(--blue); color: var(--on-blue); text-align: left;
-    box-shadow: var(--shadow); }
-  .start:hover { filter: brightness(1.06); }
-  .start:disabled { opacity: .5; pointer-events: none; }
-  .start .ic { font: 34px var(--emoji); }
-  .start b { display: block; font-size: 20px; }
-  .start span { font-size: 14px; opacity: .85; }
-  .start .go { margin-left: auto; font-size: 26px; }
-  .modelist { padding: 4px 0 8px; }
-  .modelist .g { padding: 12px 16px 4px; font-size: 12px; font-weight: 650; text-transform: uppercase;
-    letter-spacing: .06em; color: var(--muted); }
-  .modelist .it { display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px 10px; width: 100%;
-    padding: 7px 16px 7px 32px; border: none; background: none; text-align: left; }
-  .modelist .it:hover { background: var(--blue-soft); }
-  .modelist .it:disabled { opacity: .45; pointer-events: none; }
-  .modelist .it .ic { font: 15px var(--emoji); width: 20px; }
-  .modelist .it b { font-size: 15px; font-weight: 600; }
-  .modelist .it .d { color: var(--muted); font-size: 13px; }
-  .settings { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px 18px;
-    background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 16px; }
+  .phead { display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap; }
+  .phead h1 { margin: 0; font: 700 30px/1.15 var(--word); letter-spacing: -.01em; }
+  .phead p { margin: 4px 0 0; color: var(--muted); }
+  .last { display: flex; align-items: center; gap: 14px; color: var(--muted); font-size: 14px; max-width: 360px; }
+  .last b { color: var(--ink); }
+
+  .plate { margin-top: 28px; display: grid; grid-template-columns: 196px minmax(0, 1fr) auto; gap: 44px; align-items: center;
+    border-top: 4px solid var(--ink); border-bottom: 1px solid var(--line); padding: 36px 0; }
+  .tile { width: 196px; height: 196px; border-radius: var(--r-lg); display: grid; place-items: center;
+    font: 800 132px/1 var(--word); color: var(--rail); letter-spacing: -.04em; background: var(--lavender); }
+  .tile.apricot { background: var(--apricot); } .tile.pistachio { background: var(--pistachio); }
+  .tile.lemon { background: var(--lemon); } .tile.lime { background: var(--lime); }
+  .tile .emo { font: 108px/1 var(--emoji); letter-spacing: 0; }
+  .tile .ico { width: 92px; height: 92px; stroke-width: 1.8; }
+  button.tile { border: none; transition: transform .25s var(--ease), box-shadow .25s; }
+  button.tile:hover { transform: translateY(-3px); box-shadow: var(--lift); }
+  .word { font: 800 calc(var(--fs, 100) * 1px)/1.02 var(--word); letter-spacing: -.03em;
+    display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  .word.ru { font-weight: 700; letter-spacing: -.02em; }
+  .meta { margin-top: 14px; color: var(--muted); font-size: 18px; }
+  .meaning { margin-top: 6px; font: 500 30px/1.25 var(--word); }
+  .bigemo { font: 150px/1 var(--emoji); padding-right: 8px; }
+
+  .spk { border: none; background: var(--teal-soft); color: var(--teal); width: 44px; height: 44px; border-radius: 50%;
+    display: inline-grid; place-items: center; flex: none; transition: background .15s, transform .15s; }
+  .spk:hover { background: var(--mint); transform: scale(1.06); }
+  .spk .ico { width: 22px; height: 22px; }
+  .spk.sm { width: 34px; height: 34px; } .spk.sm .ico { width: 18px; height: 18px; }
+  .spk.tile { width: 176px; height: 176px; border-radius: var(--r-lg); background: var(--lemon); color: var(--rail); }
+  .spk.tile:hover { transform: translateY(-3px); box-shadow: var(--lift); background: var(--lemon); }
+  .spk.tile .ico { width: 84px; height: 84px; stroke-width: 1.8; }
+  .opt .cap { font-size: 18px; line-height: 1.25; }
+
+  .start { margin-top: 30px; display: flex; align-items: center; gap: 18px; width: 100%; max-width: 640px;
+    padding: 20px 26px; border: none; border-radius: 20px; background: var(--rail); color: #fff; text-align: left;
+    transition: transform .25s var(--ease), box-shadow .25s, background .2s; }
+  .start:hover { background: var(--rail-deep); transform: translateY(-2px); box-shadow: var(--lift); }
+  .start:disabled { opacity: .45; pointer-events: none; }
+  .start .ico { width: 34px; height: 34px; }
+  .start b { display: block; font: 700 25px/1.15 var(--word); }
+  .start span { font-size: 15px; color: rgba(255,255,255,.82); }
+  .start .go { margin-left: auto; }
+  .hintline { margin-top: 10px; font-size: 13px; color: var(--muted); }
+
+  .modes { margin-top: 36px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px 22px; }
+  .mgroup h3 { margin: 0 0 8px; font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .chip { display: block; width: 100%; text-align: left; margin-bottom: 8px; padding: 10px 14px; border: none;
+    border-radius: 12px; background: var(--c, var(--lavender)); transition: transform .2s var(--ease), box-shadow .2s; }
+  .chip:hover { transform: translateY(-2px); box-shadow: var(--lift); }
+  .chip:disabled { opacity: .45; pointer-events: none; }
+  .chip b { display: block; font-weight: 600; }
+  .chip span { display: block; font-size: 13px; color: #3d4f53; line-height: 1.35; }
+
+  .settings { margin-top: 36px; border-top: 1px solid var(--line); padding-top: 6px; }
+  .settings summary { cursor: pointer; padding: 12px 0; font-weight: 600; display: flex; align-items: center; gap: 10px;
+    list-style: none; width: max-content; }
+  .settings summary::-webkit-details-marker { display: none; }
+  .settings summary .ico { transition: transform .2s; }
+  .settings[open] summary .chev { transform: rotate(90deg); }
+  .sgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px 22px; padding: 8px 0 4px; }
   .set { display: flex; flex-direction: column; gap: 6px; font-size: 14px; color: var(--muted); }
-  .set.row { flex-direction: row; align-items: center; gap: 10px; color: var(--text); }
-  .set.row input { width: 18px; height: 18px; }
-  select { font: inherit; padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line);
-    background: var(--bg); color: var(--text); }
-  .voice-info { grid-column: 1 / -1; font-size: 13px; color: var(--muted); display: flex; gap: 10px;
-    align-items: center; flex-wrap: wrap; }
+  .set.row { flex-direction: row; align-items: center; gap: 10px; color: var(--ink); }
+  .set.row input { width: 18px; height: 18px; accent-color: var(--rail); }
+  select { padding: 9px 12px; border-radius: var(--r-sm); border: 1.5px solid var(--line-strong); background: var(--paper); color: var(--ink); }
+  .vinfo { grid-column: 1 / -1; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font-size: 14px; color: var(--muted); }
 
-  /* ---------- common buttons ---------- */
-  .btn { border: 1.5px solid var(--line); background: var(--card); padding: 10px 18px; border-radius: 12px; }
-  .btn:hover { border-color: var(--blue); }
-  .btn.primary { background: var(--blue); border-color: var(--blue); color: var(--on-blue); font-weight: 600; }
-  .btn.small { padding: 6px 12px; font-size: 14px; }
-  .spk { border: none; background: var(--blue-soft); color: var(--blue); width: 38px; height: 38px;
-    border-radius: 50%; font: 18px var(--emoji); display: inline-grid; place-items: center; flex: none;
-    vertical-align: middle; }
-  .spk:hover { filter: brightness(.95); }
-  .spk.big { width: 88px; height: 88px; font-size: 40px; }
+  /* ---------- buttons ---------- */
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 20px; border-radius: 12px;
+    border: 1.5px solid var(--line-strong); background: var(--paper); font-weight: 600; transition: border-color .15s, background .15s; }
+  .btn:hover { border-color: var(--rail); }
+  .btn.primary { background: var(--rail); border-color: var(--rail); color: #fff; }
+  .btn.primary:hover { background: var(--rail-deep); }
+  .btn.small { padding: 7px 14px; font-size: 14px; }
 
-  /* ---------- pictures ---------- */
-  .pic { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
-  .pic .emo { font: 54px/1.1 var(--emoji); white-space: nowrap; }
-  .pic img { max-width: 100%; max-height: 120px; border-radius: 10px; object-fit: cover; }
-  .pic .tag { font-size: 13px; font-weight: 700; padding: 1px 9px; border-radius: 999px;
-    background: var(--blue-soft); color: var(--blue); }
-  .pic .tag.warm { background: var(--warm-soft); color: var(--warm); }
-  .pic .tag.cold { background: var(--cold-soft); color: var(--cold); }
-  .pic.lg .emo { font-size: 92px; }
-  .pic.lg img { max-height: 200px; }
-  .pic.sm .emo { font-size: 34px; }
-  .pic.sm .tag { font-size: 11px; }
-  .pic.xs .emo { font-size: 32px; }
-  .pic.xs .tag { display: none; }
+  /* ---------- stamp (signature) ---------- */
+  .stamp { display: inline-grid; place-items: center; flex: none; width: 64px; height: 64px; border-radius: 50%;
+    border: 3px solid currentColor; box-shadow: inset 0 0 0 3px var(--paper), inset 0 0 0 5px currentColor;
+    font: 800 22px/1 var(--word); letter-spacing: -.02em; transform: rotate(-12deg); color: var(--teal); }
+  .stamp.bad { color: var(--brick); }
+  .stamp .ico { width: 28px; height: 28px; stroke-width: 3.2; }
+  .stamp.sm { width: 40px; height: 40px; font-size: 14px; border-width: 2px; box-shadow: inset 0 0 0 2px var(--paper), inset 0 0 0 3.5px currentColor; }
+  .stamp.sm .ico { width: 18px; height: 18px; }
+  .stamp.xl { width: 210px; height: 210px; font-size: 84px; border-width: 6px; box-shadow: inset 0 0 0 7px var(--page), inset 0 0 0 11px currentColor; }
+  .stamp.land { animation: stamp .42s var(--ease) both; }
+  @keyframes stamp { from { transform: rotate(-26deg) scale(1.7); opacity: 0; } 60% { opacity: 1; } to { transform: rotate(-12deg) scale(1); } }
 
   /* ---------- quiz ---------- */
-  .qbar { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-  .x { border: none; background: none; font-size: 22px; color: var(--muted); padding: 4px 8px; }
-  .prog { flex: 1; height: 10px; background: var(--line); border-radius: 999px; overflow: hidden; }
-  .prog i { display: block; height: 100%; background: var(--blue); border-radius: 999px; transition: width .3s; }
-  .score { font-weight: 700; font-size: 15px; white-space: nowrap; }
-  .score .o { color: var(--ok); } .score .b { color: var(--bad); margin-left: 8px; }
-  .hint { text-align: center; color: var(--muted); font-size: 14px; margin: 4px 0 10px; }
-  .qcard { background: var(--card); border-radius: var(--r); box-shadow: var(--shadow); border: 1px solid var(--line);
-    padding: 26px 16px; text-align: center; min-height: 170px; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 12px; }
-  .qword { font-size: 38px; font-weight: 700; display: flex; align-items: center; gap: 12px;
-    justify-content: center; flex-wrap: wrap; }
-  .qword.ru { font-size: 32px; }
-  .opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
-  .opt { position: relative; background: var(--card); border: 2px solid var(--line); border-radius: var(--r);
-    padding: 16px 14px 16px 36px; font-size: 19px; text-align: left; min-height: 64px; box-shadow: var(--shadow);
-    transition: border-color .12s, background .12s; }
-  .opt:hover:not(:disabled) { border-color: var(--blue); }
-  .opt .k { position: absolute; left: 10px; top: 8px; font-size: 12px; color: var(--muted); font-weight: 700; }
-  .opts.pics .opt { padding: 18px 8px 14px; display: flex; flex-direction: column; align-items: center;
-    justify-content: center; gap: 8px; min-height: 150px; text-align: center; }
-  .opt .cap { font-size: 17px; line-height: 1.25; }
-  .opts.pics { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
-  .opt.right { border-color: var(--ok); background: var(--ok-soft); }
-  .opt.wrong { border-color: var(--bad); background: var(--bad-soft); }
+  .qhead { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 36px; }
+  .prompt { font-size: 15px; font-weight: 600; color: var(--muted); }
+  .qplate { margin-top: 14px; display: grid; grid-template-columns: 176px minmax(0, 1fr) auto; gap: 40px; align-items: center;
+    min-height: 248px; border-top: 4px solid var(--ink); border-bottom: 1px solid var(--line); padding: 32px 0; }
+  .qplate .tile { width: 176px; height: 176px; font-size: 116px; }
+  .qplate .tile .emo { font-size: 100px; }
+  .qemo { font: 150px/1 var(--emoji); padding-right: 8px; }
+  .qemo .pic img { max-height: 170px; }
+  .qemo.in { animation: rise .5s var(--ease) both; }
+  @keyframes rise { from { opacity: 0; transform: translateY(12px) scale(.9); } }
+  .qplate .sub { margin-top: 10px; color: var(--muted); font-size: 17px; }
+  .opts { margin-top: 26px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .opts.six { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .opt { position: relative; display: flex; align-items: center; gap: 14px; min-height: 76px; padding: 14px 70px 14px 16px;
+    border: 2px solid var(--line); border-radius: var(--r); background: var(--paper); text-align: left;
+    font: 500 21px/1.25 var(--ui); transition: transform .2s var(--ease), box-shadow .2s, border-color .15s, opacity .2s, background .2s; }
+  .opt.ro { font-family: var(--word); font-weight: 600; }
+  .opt .k { flex: none; width: 30px; height: 30px; border-radius: 9px; background: var(--page); border: 1.5px solid var(--line);
+    display: grid; place-items: center; font: 600 14px var(--ui); color: var(--muted); }
+  .opt:hover:not(:disabled) { border-color: var(--rail); transform: translateY(-2px); box-shadow: var(--lift); }
   .opt:disabled { cursor: default; }
-  .opt.dim { opacity: .5; }
-  .after { margin-top: 14px; min-height: 60px; }
-  .reveal { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: var(--r);
-    background: var(--card); border: 1px solid var(--line); flex-wrap: wrap; }
-  .reveal .verdict { font-weight: 700; }
-  .reveal.ok .verdict { color: var(--ok); } .reveal.bad .verdict { color: var(--bad); }
-  .reveal .info { flex: 1; min-width: 200px; }
-  .reveal .ex, .card .ex { font-size: 14px; color: var(--muted); cursor: pointer; }
-  .reveal .ex:hover, .card .ex:hover { color: var(--blue); }
-  .tr { color: var(--muted); font-size: 14px; font-weight: 400; }
-  .nextrow { display: flex; justify-content: flex-end; margin-top: 10px; gap: 10px; align-items: center; }
-  .keys { font-size: 12px; color: var(--muted); margin-right: auto; }
+  .opt.right { border-color: var(--teal); background: var(--teal-soft); }
+  .opt.wrong { border-color: var(--brick); background: var(--brick-soft); }
+  .opt.dim { opacity: .42; }
+  .opt .stamp { position: absolute; right: 14px; top: 50%; margin-top: -20px; }
+  .opts.pics .opt { flex-direction: column; justify-content: center; text-align: center; gap: 8px; min-height: 168px; padding: 18px 12px; }
+  .opts.pics .opt .k { position: absolute; left: 12px; top: 12px; }
+  .opts.pics .opt .stamp { top: 12px; right: 12px; margin-top: 0; }
 
-  /* ---------- match ---------- */
-  .match { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .col { display: flex; flex-direction: column; gap: 8px; }
-  .mi { background: var(--card); border: 2px solid var(--line); border-radius: 12px; padding: 12px;
-    min-height: 62px; font-size: 18px; box-shadow: var(--shadow); transition: all .15s; }
-  .mi.p { padding: 6px 10px; }
-  .mi .pr { display: flex; align-items: center; justify-content: center; gap: 10px; }
-  .mi:hover { border-color: var(--blue); }
-  .mi.sel { border-color: var(--blue); background: var(--blue-soft); }
-  .mi.done { border-color: var(--ok); background: var(--ok-soft); opacity: .45; pointer-events: none; }
-  .mi.wrong { border-color: var(--bad); background: var(--bad-soft); animation: shake .35s; }
-  @keyframes shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
+  .pic { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .pic .emo { font: 56px/1.05 var(--emoji); white-space: nowrap; }
+  .pic img { max-width: 100%; max-height: 120px; border-radius: 10px; object-fit: cover; }
+  .pic .tag { font: 600 12.5px var(--ui); padding: 2px 9px; border-radius: 99px; background: var(--page); color: var(--teal); border: 1px solid var(--line); }
+  .pic .tag.warm { background: #fff1e6; color: #9a4410; border-color: #f6d2b5; }
+  .pic .tag.cold { background: #e7f2fb; color: #1e5a8a; border-color: #c8def0; }
+  .pic.mob { display: none; }
+  .pic.sm .emo { font-size: 40px; } .pic.sm .tag { font-size: 11px; }
+  .pic.xs .emo { font-size: 30px; } .pic.xs .tag { display: none; }
+  .pic.card .emo { font-size: 60px; }
+
+  .after { margin-top: 18px; min-height: 132px; }
+  .reveal { display: flex; align-items: center; gap: 20px; padding: 16px 20px; border-radius: var(--r);
+    background: var(--paper); border: 1px solid var(--line); }
+  .reveal .info { flex: 1; min-width: 0; }
+  .reveal .verdict { font: 700 18px var(--word); color: var(--teal); }
+  .reveal.bad .verdict { color: var(--brick); }
+  .reveal .line { margin-top: 2px; font-size: 17px; }
+  .reveal .line b { font-family: var(--word); font-weight: 700; font-size: 19px; }
+  .tr { color: var(--muted); font-size: 14px; font-weight: 400; }
+  .ex { display: inline-flex; align-items: flex-start; gap: 6px; margin-top: 4px; font-size: 14px; color: var(--muted);
+    cursor: pointer; border: none; background: none; padding: 0; text-align: left; }
+  .ex .ico { width: 14px; height: 14px; margin-top: 3px; color: var(--teal); }
+  .ex:hover { color: var(--teal); }
+  .nextrow { display: flex; align-items: center; gap: 16px; margin-top: 12px; }
+  .nextrow .btn { margin-left: auto; }
+  .lrn { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); cursor: pointer; user-select: none; }
+  .lrn input { width: 18px; height: 18px; margin: 0; accent-color: var(--teal); cursor: pointer; }
+
+  /* ---------- pairs ---------- */
+  .match { margin-top: 26px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 18px; }
+  .col { display: flex; flex-direction: column; gap: 10px; }
+  .lrow { display: flex; align-items: center; gap: 10px; }
+  .lrow .mi { flex: 1; }
+  .mi { position: relative; min-height: 66px; padding: 10px 16px; border: 2px solid var(--line); border-radius: var(--r); background: var(--paper);
+    font-size: 19px; transition: transform .2s var(--ease), box-shadow .2s, border-color .15s, background .2s, opacity .3s; }
+  .mi.ro { font: 600 21px var(--word); }
+  .mi:hover { border-color: var(--rail); transform: translateY(-2px); box-shadow: var(--lift); }
+  .mi.sel { border-color: var(--rail); background: var(--teal-soft); transform: translateY(-2px); box-shadow: var(--lift); }
+  .mi.done { border-color: var(--teal-soft); background: var(--teal-soft); color: var(--muted); pointer-events: none; transform: none; box-shadow: none; }
+  .mi .stamp { position: absolute; right: 10px; top: 50%; margin-top: -20px; }
+  .mi.done:has(.stamp) { padding-right: 58px; }
+  .mi.wrong { border-color: var(--brick); background: var(--brick-soft); animation: shake .35s; }
+  .mi .pr { display: flex; align-items: center; justify-content: center; gap: 12px; }
+  @keyframes shake { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+  .lhint { margin-top: 14px; font-size: 13px; color: var(--muted); }
 
   /* ---------- cards ---------- */
-  .toolbar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
-  .toolbar .btn.on { border-color: var(--blue); background: var(--blue-soft); }
-  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
-  .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 14px;
-    box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 6px; }
-  .card .pic { min-height: 90px; }
-  .card .cro { font-size: 20px; font-weight: 700; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .cards { margin-top: 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 16px; }
+  .card { background: var(--paper); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden;
+    display: flex; flex-direction: column; transition: opacity .2s; }
+  .card .top { background: var(--c, var(--lavender)); min-height: 104px; display: grid; place-items: center; padding: 14px; }
+  .card .top .nopic { font: 800 56px/1 var(--word); color: var(--rail); }
+  .card .body { padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+  .card .cro { display: flex; align-items: center; justify-content: space-between; gap: 8px; font: 700 22px/1.2 var(--word); }
   .card .cru { font-size: 16px; }
   .card .note { font-size: 13px; color: var(--muted); }
-  .card .st { font-size: 12px; color: var(--muted); }
+  .card .st { margin-top: auto; padding-top: 10px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted); }
   .card.learned { opacity: .55; }
-  .lrn { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted);
-    cursor: pointer; user-select: none; }
-  .lrn input { width: 17px; height: 17px; margin: 0; accent-color: var(--ok); cursor: pointer; }
-  .lrow { display: flex; align-items: center; gap: 8px; }
-  .lrow .mi { flex: 1; }
-  .lhint { margin-top: 10px; font-size: 13px; color: var(--muted); text-align: center; }
-  .lrninfo { margin-top: 10px; font-size: 14px; color: var(--muted); display: flex; gap: 8px;
-    align-items: center; flex-wrap: wrap; }
-  .trow .lk { color: var(--ok); font-size: 13px; margin-right: 6px; }
   .hidden-txt { filter: blur(7px); cursor: pointer; user-select: none; }
 
   /* ---------- results ---------- */
-  .res { text-align: center; }
-  .res .big { font: 64px var(--emoji); }
-  .res h1 { font-size: 40px; }
-  .mlist { display: flex; flex-direction: column; gap: 8px; text-align: left; margin: 0 auto; max-width: 520px; }
-  .mrow { display: flex; align-items: center; gap: 12px; background: var(--card); border: 1px solid var(--line);
-    border-radius: 12px; padding: 8px 12px; }
-  .mrow .w { flex: 1; } .mrow b { font-size: 18px; }
-  .btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 22px; }
+  .result { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 48px; align-items: center;
+    border-bottom: 1px solid var(--line); padding: 8px 0 40px; }
+  .result h1 { margin: 0; font: 800 64px/1 var(--word); letter-spacing: -.03em; }
+  .result .gname { margin-top: 10px; font: 500 24px var(--word); color: var(--muted); }
+  .result .score { margin-top: 14px; font-size: 18px; }
+  .mlist { margin-top: 28px; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
+  .mrow { display: flex; align-items: center; gap: 14px; background: var(--paper); border: 1px solid var(--line);
+    border-radius: var(--r); padding: 10px 14px; }
+  .mrow .w { flex: 1; min-width: 0; } .mrow b { font: 700 19px var(--word); }
+  .btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+  h2.sec { margin: 34px 0 0; font: 700 20px var(--word); }
 
-  .toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: var(--text);
-    color: var(--bg); padding: 10px 16px; border-radius: 10px; font-size: 14px; max-width: 90vw;
-    opacity: 0; transition: opacity .2s; pointer-events: none; }
-  .toast.show { opacity: 1; }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 12px); background: var(--ink); color: #fff;
+    padding: 11px 18px; border-radius: 12px; font-size: 14px; max-width: min(90vw, 560px); opacity: 0;
+    transition: opacity .25s, transform .35s var(--ease); pointer-events: none; z-index: 10; }
+  .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-  @media (max-width: 520px) {
-    .qword { font-size: 30px; } .qword.ru { font-size: 26px; }
-    .opts { grid-template-columns: 1fr; }
+  @media (max-width: 1080px) {
+    .modes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .plate { grid-template-columns: 150px minmax(0, 1fr); }
+    .plate .tile { width: 150px; height: 150px; font-size: 100px; }
+    .bigemo { display: none; }
+  }
+  @media (max-width: 820px) {
+    .shell { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+    .rail { position: static; height: auto; padding: 18px 16px; gap: 14px; }
+    .rail-foot { margin-top: 0; }
+    .brand b { font-size: 22px; } .brand b br { display: none; } .brand small { margin-top: 4px; }
+    .topics { flex-direction: row; flex-wrap: wrap; gap: 6px; }
+    .trow { width: auto; padding: 7px 11px; gap: 8px; border: 1px solid var(--rail-line); }
+    .trow .nm small { display: none; }
+    .rail .label { display: none; }
+    .rail.sess { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 12px 14px; }
+    .rail.sess > * { grid-column: 1 / -1; }
+    .rail.sess > .session { grid-column: 1; } .rail.sess > .tally { grid-column: 2; }
+    .rail.sess .brand, .rail.sess .keys, .rail.sess .rnote, .rail.sess .session .label { display: none; }
+    .rail.sess .session .mode { font-size: 17px; }
+    .rail.sess .session .count { font-size: 30px; margin-top: 4px !important; }
+    .rail.sess .tally { display: flex; flex-direction: column; gap: 6px; }
+    .rail.sess .tally div { padding: 5px 10px; }
+    .rail.sess .tally b { font-size: 17px; display: inline; margin-right: 4px; }
+    .rail.sess .rbtn { padding: 8px 12px; }
+    .page { padding: 22px 16px 40px; }
+    .page.home { display: flex; flex-direction: column; }
+    .page.home .start { order: 1; margin-top: 18px; } .page.home .plate { order: 2; }
+    .page.home .modes { order: 3; } .page.home .settings { order: 4; } .hintline { display: none; }
+    .word { --k: .62; font-size: calc(var(--fs, 100) * var(--k) * 1px); }
+    .plate, .qplate { grid-template-columns: 96px minmax(0, 1fr); gap: 18px; padding: 22px 0; min-height: 0; }
+    .plate .tile, .qplate .tile, .spk.tile { width: 96px; height: 96px; font-size: 62px; border-radius: 18px; }
+    .spk.tile .ico { width: 48px; height: 48px; }
+    .qplate .tile .emo, .plate .tile .emo { font-size: 56px; } .tile .ico { width: 52px; height: 52px; }
+    .meaning { font-size: 22px; } .meta { font-size: 15px; }
+    .opts, .opts.six { grid-template-columns: 1fr; gap: 8px; margin-top: 16px; }
+    .opt { min-height: 54px; font-size: 18px; padding: 10px 56px 10px 12px; }
+    .qhead { min-height: 0; }
+    .qemo { display: none; } .pic.mob { display: flex; }
+    .after { min-height: 0; }
     .opts.pics { grid-template-columns: 1fr 1fr; }
-    .opts.pics .opt { min-height: 120px; }
-    .pic .emo { font-size: 44px; } .pic.lg .emo { font-size: 76px; }
-    .mi { font-size: 16px; }
+    .modes { grid-template-columns: 1fr; }
+    .result { grid-template-columns: 1fr; gap: 20px; }
+    .stamp.xl { width: 140px; height: 140px; font-size: 56px; }
+    .mi, .mi.ro { font-size: 16px; }
+    .reveal { flex-wrap: wrap; gap: 10px 14px; padding: 14px; }
+    .reveal .info { order: 3; flex: 1 1 100%; }
+    .reveal > .stamp:not(.sm) { width: 48px; height: 48px; }
+    .reveal > .stamp .ico { width: 22px; height: 22px; }
+    .reveal .spk { margin-left: auto; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
   }
 </style>
 </head>
 <body>
-<div class="wrap" id="app"></div>
-<div class="toast" id="toast"></div>
+<div class="shell">
+  <aside class="rail" id="rail"></aside>
+  <main class="page" id="app"></main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="words.js"></script>
 <script src="audio/index.js"></script>
@@ -216,6 +352,7 @@
 
 /* ================= helpers ================= */
 const app = document.getElementById('app');
+const rail = document.getElementById('rail');
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.random() * (i + 1) | 0; [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const pickRandom = a => a[Math.random() * a.length | 0];
@@ -230,11 +367,27 @@ function toast(msg, ms = 3000) {
   clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), ms);
 }
 
+/* Line icons (one stroke family) */
+const ICONS = {
+  speaker: '<path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/>',
+  x: '<path d="M6 6l12 12M18 6 6 18"/>',
+  check: '<path d="M5 12.5l4.5 4.5L19 7.5"/>',
+  minus: '<path d="M6 12h12"/>',
+  arrow: '<path d="M5 12h14M13 6l6 6-6 6"/>',
+  back: '<path d="M19 12H5M11 6l-6 6 6 6"/>',
+  chev: '<path d="M9 6l6 6-6 6"/>',
+  shuffle: '<path d="M3 7h3.5c2.5 0 3.5 1.5 5 5s2.5 5 5 5H21"/><path d="M3 17h3.5c1.2 0 2-.4 2.7-1.2M14.8 8.2c.7-.8 1.5-1.2 2.7-1.2H21"/><path d="M18 4l3 3-3 3M18 14l3 3-3 3"/>',
+  sliders: '<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
+};
+const icon = (name, cls = '') => `<svg class="ico ${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[name]}</svg>`;
+
 /* ================= data ================= */
 const TOPICS = (window.TOPICS || []).map(t => ({
   ...t, words: t.words.map(w => ({ ...w, topic: t.id, key: t.id + '|' + w.ro })),
 }));
 const ALL = TOPICS.flatMap(t => t.words);
+const CRAYONS = ['var(--lavender)', 'var(--apricot)', 'var(--pistachio)', 'var(--lemon)', 'var(--mint)', 'var(--lime)'];
+const topicColor = id => CRAYONS[Math.max(0, TOPICS.findIndex(t => t.id === id)) % CRAYONS.length];
 
 const settings = Object.assign(
   { options: 4, length: 'all', autoplay: true, autonext: true, voice: 'auto', rate: 0.85 },
@@ -256,6 +409,21 @@ function record(w, ok) {
   ok ? s.c++ : s.w++;
   LS.set('stats', stats);
 }
+
+// Romanian school marks (calificative) for a session result
+function grade(pct) {
+  if (pct >= 90) return { g: 'FB', name: 'Foarte bine', ru: 'отлично', ok: true };
+  if (pct >= 70) return { g: 'B', name: 'Bine', ru: 'хорошо', ok: true };
+  if (pct >= 50) return { g: 'S', name: 'Suficient', ru: 'удовлетворительно', ok: false };
+  return { g: 'I', name: 'Insuficient', ru: 'нужно повторить', ok: false };
+}
+const stamp = (ok, inner, cls = '') => `<span class="stamp ${ok ? '' : 'bad'} ${cls}" aria-hidden="true">${inner}</span>`;
+
+// Word size steps so long phrases still fit the plate
+const wordSize = (text, steps) => (steps.find(([n]) => [...text].length <= n) || steps[steps.length - 1])[1];
+const FS_PLATE = [[7, 112], [11, 92], [15, 74], [21, 60], [99, 46]];
+const FS_RU = [[8, 80], [14, 64], [22, 50], [99, 40]];
+const initial = s => { const c = (s.match(/\p{L}/u) || ['?'])[0]; return c.toUpperCase() + c.toLowerCase(); };
 
 /* ================= speech ================= */
 const Speech = {
@@ -323,19 +491,43 @@ if ('speechSynthesis' in window) {
 let sayRegistry = [];
 function sayBtn(item, cls = '') {
   sayRegistry.push(item);
-  return `<button class="spk ${cls}" data-say="${sayRegistry.length - 1}" title="Послушать" aria-label="Послушать">🔊</button>`;
+  return `<button class="spk ${cls}" data-say="${sayRegistry.length - 1}" title="Послушать" aria-label="Послушать">${icon('speaker')}</button>`;
 }
-function bindSay() {
-  app.querySelectorAll('[data-say]').forEach(b => b.addEventListener('click', e => {
-    e.stopPropagation(); Speech.say(sayRegistry[+b.dataset.say]);
-  }));
+function bindSay(root = app) {
+  root.querySelectorAll('[data-say]').forEach(b => {
+    if (b.dataset.sbound) return;
+    b.dataset.sbound = '1';
+    b.addEventListener('click', e => { e.stopPropagation(); Speech.say(sayRegistry[+b.dataset.say]); });
+  });
 }
-function setHTML(html) { app.innerHTML = html; bindSay(); bindLearn(); }
+function setHTML(html) { if (screen !== 'home') app.classList.remove('home'); app.innerHTML = html; bindSay(); bindLearn(); fitWords(); window.scrollTo(0, 0); }
+// Shrink big words until the longest one fits its column (no mid-word breaks)
+function fitWords() {
+  app.querySelectorAll('.word').forEach(el => {
+    el.style.fontSize = '';
+    let size = parseFloat(getComputedStyle(el).fontSize);
+    const text = el.firstChild;
+    if (!text || text.nodeType !== 3) return;
+    const range = document.createRange();
+    range.selectNodeContents(text);
+    const widest = () => Math.max(...[...range.getClientRects()].map(r => r.width), 0);
+    while (size > 26 && widest() > el.clientWidth - 1) { size -= 3; el.style.fontSize = size + 'px'; }
+  });
+}
+addEventListener('resize', () => { clearTimeout(fitWords.t); fitWords.t = setTimeout(fitWords, 120); });
+function setRail(html, sess = false) {
+  rail.innerHTML = html;
+  rail.classList.toggle('sess', sess);
+  rail.querySelectorAll('[data-act=menu]').forEach(b => b.onclick = renderHome);
+}
+const brand = (home = false) => home
+  ? `<div class="brand"><b>Învățăm <br>cuvinte</b><small>румынский по урокам</small></div>`
+  : `<button class="brand" data-act="menu" title="В меню"><b>Învățăm <br>cuvinte</b><small>румынский по урокам</small></button>`;
 
 /* "Learned" checkboxes: render with learnBox(), activate with bindLearn() after innerHTML. */
 function learnBox(w, withLabel = true) {
   return `<label class="lrn" title="Выучено — больше не показывать в упражнениях"><input type="checkbox"
-    data-learn="${esc(w.key)}" ${isLearned(w) ? 'checked' : ''}>${withLabel ? '<span>выучено</span>' : ''}</label>`;
+    data-learn="${esc(w.key)}" ${isLearned(w) ? 'checked' : ''} aria-label="Выучено: ${esc(w.ro)}">${withLabel ? '<span>выучено</span>' : ''}</label>`;
 }
 function bindLearn() {
   app.querySelectorAll('[data-learn]').forEach(cb => {
@@ -375,20 +567,22 @@ const QUIZ_TYPES = ['ro-ru', 'ru-ro', 'audio-ru', 'ro-pic', 'pic-ro'];
 const mixType = w => pickRandom(hasPic(w) ? QUIZ_TYPES : QUIZ_TYPES.filter(t => t !== 'ro-pic' && t !== 'pic-ro'));
 // same synonym group (syn) — never offered together as options or in one pairs round
 const sameSyn = (a, b) => !!(a.syn && a.syn === b.syn);
-const MODES = [
-  { group: 'Изучение' },
-  { id: 'cards', ic: '📖', name: 'Карточки', desc: 'Посмотреть, послушать, проверить себя' },
-  { group: 'Перевод' },
-  { id: 'ro-ru', ic: '🔤', name: 'RO → RU', desc: 'Выбрать перевод слова' },
-  { id: 'ru-ro', ic: '🔁', name: 'RU → RO', desc: 'Выбрать румынское слово' },
-  { id: 'audio-ru', ic: '🎧', name: 'На слух', desc: 'Услышать и выбрать перевод' },
-  { group: 'С картинками' },
-  { id: 'ro-pic', ic: '🖼️', name: 'RO → картинка', desc: 'Перевод с картинкой-подсказкой' },
-  { id: 'pic-ro', ic: '🔍', name: 'Картинка → RO', desc: 'Картинка с переводом → румынское слово' },
-  { group: 'Пары' },
-  { id: 'match-ru', ic: '🧩', name: 'Слово — перевод', desc: 'Соединить пары из двух списков' },
-  { id: 'match-pic', ic: '🧩', name: 'Слово — картинка', desc: 'Пары: слово и картинка с переводом' },
+const MODE_GROUPS = [
+  { name: 'Изучение', color: 'var(--lavender)', modes: [
+    { id: 'cards', name: 'Карточки', desc: 'Посмотреть, послушать, проверить себя' }] },
+  { name: 'Перевод', color: 'var(--apricot)', modes: [
+    { id: 'ro-ru', name: 'RO → RU', desc: 'Выбрать перевод слова' },
+    { id: 'ru-ro', name: 'RU → RO', desc: 'Выбрать румынское слово' },
+    { id: 'audio-ru', name: 'На слух', desc: 'Услышать и выбрать перевод' }] },
+  { name: 'С картинками', color: 'var(--pistachio)', modes: [
+    { id: 'ro-pic', name: 'RO → картинка', desc: 'Перевод с картинкой-подсказкой' },
+    { id: 'pic-ro', name: 'Картинка → RO', desc: 'Картинка с переводом → слово' }] },
+  { name: 'Пары', color: 'var(--lemon)', modes: [
+    { id: 'match-ru', name: 'Слово — перевод', desc: 'Соединить пары из двух списков' },
+    { id: 'match-pic', name: 'Слово — картинка', desc: 'Слово и картинка с переводом' }] },
 ];
+const MODE_NAMES = Object.fromEntries(MODE_GROUPS.flatMap(g => g.modes.map(m => [m.id, m.name])));
+MODE_NAMES.mix = 'Микс';
 const PROMPTS = {
   'ro-ru': 'Выберите перевод',
   'ru-ro': 'Выберите румынское слово',
@@ -399,80 +593,124 @@ const PROMPTS = {
 
 let screen = 'home';
 let last = null;   // { mode, words } — for "again" / "retry mistakes"
+let featuredKey = null;
 
 /* ================= home ================= */
 function renderHome() {
   screen = 'home';
+  app.classList.add('home');
   sayRegistry = [];
+  if (Q) clearTimeout(Q.timer);
   const sel = practiceWords();
   const learnedSel = selectedWords().filter(isLearned);
   const allOn = selected.length === TOPICS.length;
   const opt = (v, cur, label) => `<option value="${v}" ${String(v) === String(cur) ? 'selected' : ''}>${label}</option>`;
+
+  setRail(`
+    ${brand(true)}
+    <nav aria-label="Темы">
+      <div class="label">Темы</div>
+      <div class="topics">
+        ${TOPICS.length > 1 ? `<button class="trow all ${allOn ? 'on' : selected.length ? 'part' : ''}" data-all aria-pressed="${allOn}">
+          <span class="cb">${allOn ? icon('check') : selected.length ? icon('minus') : ''}</span>
+          <span class="nm">Все темы</span><span class="n">${ALL.length}</span></button>` : ''}
+        ${TOPICS.map(t => { const on = selected.includes(t.id); const k = t.words.filter(isLearned).length; return `
+          <button class="trow ${on ? 'on' : ''}" data-topic="${esc(t.id)}" aria-pressed="${on}">
+            <span class="cb">${on ? icon('check') : ''}</span>
+            <span class="nm">${esc(t.name)}<small>${esc(t.ru || '')}</small></span>
+            <span class="n">${k ? `<span class="lk" title="выучено">${icon('check')}${k}</span>` : ''}${t.words.length}</span>
+          </button>`; }).join('')}
+      </div>
+    </nav>
+    <div class="rail-foot">
+      <button class="rbtn" data-act="settings">${icon('sliders')} Настройки</button>
+      ${learnedSel.length ? `<div class="rnote">Выучено в выбранных темах: <b>${learnedSel.length}</b>. Эти слова не попадают в упражнения.</div>
+        <button class="rbtn" data-act="learned">Выученные слова</button>` : ''}
+    </div>
+  `);
+
+  const feat = featuredWord(sel);
+  const res = LS.get('lastResult', null);
+  const topicsCount = selected.length;
+  const plate = feat ? `
+    <section class="plate" aria-label="Слово дня">
+      <button class="tile" style="background:${topicColor(feat.topic)}" data-act="hear" title="Послушать">${esc(initial(feat.ro))}</button>
+      <div>
+        <div class="word" style="--fs:${wordSize(feat.ro, FS_PLATE)}">${esc(feat.ro)} ${sayBtn(feat)}</div>
+        <div class="meta">${feat.tr ? `[${esc(feat.tr)}]` : ''}${feat.ex ? ` · ${esc(feat.ex)}` : ''}</div>
+        <div class="meaning">${esc(feat.ru)}</div>
+      </div>
+      ${hasPic(feat) && !feat.img ? `<div class="bigemo" aria-hidden="true">${esc(feat.pic)}</div>` : '<div></div>'}
+    </section>` : `
+    <section class="plate"><div class="tile">?</div><div>
+      <div class="word" style="--fs:60">Выберите тему</div>
+      <div class="meta">Отметьте темы слева — и можно начинать.</div></div><div></div></section>`;
+
   setHTML(`
-    <header class="top">
-      <span class="flag"><i style="background:#002B7F"></i><i style="background:#FCD116"></i><i style="background:#CE1126"></i></span>
-      <h1>Învățăm cuvinte</h1>
+    <header class="phead">
+      <div>
+        <h1>Сегодня · ${sel.length} ${plural(sel.length, 'слово', 'слова', 'слов')} для практики</h1>
+        <p>${topicsCount ? `Выбрано тем: ${topicsCount}` : 'Темы не выбраны'}${learnedSel.length ? ` · ${learnedSel.length} уже выучено` : ''}</p>
+      </div>
+      ${res ? `<div class="last">${stamp(grade(res.pct).ok, esc(grade(res.pct).g), 'sm')}
+        <span>Прошлое занятие: <b>${esc(grade(res.pct).name)}</b> — ${res.good} из ${res.total} ${esc(res.unit)}</span></div>` : ''}
     </header>
-    <div class="muted">Учим румынские слова: перевод, картинки, пары и произношение.</div>
-
-    <h2>Темы</h2>
-    <div class="panel">
-      ${TOPICS.length > 1 ? `<button class="trow all ${allOn ? 'on' : selected.length ? 'part' : ''}" data-all>
-        <span class="cb">${allOn ? '✓' : selected.length ? '–' : ''}</span>
-        <span class="nm">Все темы</span><span class="n">${ALL.length}</span></button>` : ''}
-      ${TOPICS.map(t => { const on = selected.includes(t.id); return `<button class="trow ${on ? 'on' : ''}" data-topic="${esc(t.id)}">
-        <span class="cb">${on ? '✓' : ''}</span>
-        <span class="nm">${esc(t.name)}<span class="sub">${esc(t.ru || '')}</span></span>
-        <span class="n">${(k => k ? `<span class="lk">✓ ${k}</span>` : '')(t.words.filter(isLearned).length)}${t.words.length}</span></button>`; }).join('')}
-    </div>
-    ${learnedSel.length ? `<div class="lrninfo">✓ Выучено в выбранных темах: <b>${learnedSel.length}</b> — эти слова не попадают в упражнения.
-      <button class="btn small" data-act="learned">Посмотреть / вернуть</button></div>` : ''}
-
+    ${plate}
     <button class="start" data-mode="mix" ${sel.length < 2 ? 'disabled' : ''}>
-      <span class="ic">🎲</span>
-      <span><b>Начать · Микс</b><span>${sel.length} слов для практики · все задания вперемешку, включая пары</span></span>
-      <span class="go">→</span>
+      ${icon('shuffle')}
+      <span><b>Начать · Микс</b><span>Все задания вперемешку, включая пары</span></span>
+      ${icon('arrow', 'go')}
     </button>
+    <div class="hintline">Enter — начать. Во время занятия: <kbd>1</kbd>–<kbd>${settings.options}</kbd> ответ, <kbd>Enter</kbd> дальше, <kbd>R</kbd> звук, <kbd>Esc</kbd> выход.</div>
 
-    <h2>Другие режимы</h2>
-    <div class="panel modelist">
-      ${MODES.map(m => m.group ? `<div class="g">${m.group}</div>` :
-        `<button class="it" data-mode="${m.id}" ${(m.id === 'cards' ? selectedWords() : sel).length < (m.id === 'cards' ? 1 : 2) ? 'disabled' : ''}>
-          <span class="ic">${m.ic}</span><b>${m.name}</b><span class="d">${m.desc}</span></button>`).join('')}
-    </div>
+    <section class="modes" aria-label="Другие режимы">
+      ${MODE_GROUPS.map(g => `<div class="mgroup"><h3>${g.name}</h3>
+        ${g.modes.map(m => `<button class="chip" style="--c:${g.color}" data-mode="${m.id}"
+          ${(m.id === 'cards' ? selectedWords() : sel).length < (m.id === 'cards' ? 1 : 2) ? 'disabled' : ''}>
+          <b>${m.name}</b><span>${m.desc}</span></button>`).join('')}
+      </div>`).join('')}
+    </section>
 
-    <h2>Настройки</h2>
-    <div class="settings">
-      <label class="set">Вариантов ответа
-        <select data-set="options">${[3, 4, 6].map(n => opt(n, settings.options, n)).join('')}</select></label>
-      <label class="set">Слов за занятие
-        <select data-set="length">${opt(10, settings.length, '10')}${opt(20, settings.length, '20')}${opt('all', settings.length, 'Все выбранные')}</select></label>
-      <label class="set">Голос
-        <select data-set="voice" id="voiceSel"></select></label>
-      <label class="set">Скорость речи
-        <select data-set="rate">${opt(0.7, settings.rate, 'Медленно')}${opt(0.85, settings.rate, 'Спокойно')}${opt(1, settings.rate, 'Обычно')}</select></label>
-      <label class="set row"><input type="checkbox" data-set="autoplay" ${settings.autoplay ? 'checked' : ''}> Автоматически произносить слова</label>
-      <label class="set row"><input type="checkbox" data-set="autonext" ${settings.autonext ? 'checked' : ''}> Переходить дальше после верного ответа</label>
-      <div class="voice-info"><span id="voiceInfo"></span>
-        <button class="btn small" id="testVoice">🔊 Проверить: «Afară plouă»</button></div>
-    </div>
+    <details class="settings">
+      <summary>${icon('chev', 'chev')} Настройки</summary>
+      <div class="sgrid">
+        <label class="set">Вариантов ответа
+          <select data-set="options">${[3, 4, 6].map(n => opt(n, settings.options, n)).join('')}</select></label>
+        <label class="set">Слов за занятие
+          <select data-set="length">${opt(10, settings.length, '10')}${opt(20, settings.length, '20')}${opt('all', settings.length, 'Все выбранные')}</select></label>
+        <label class="set">Голос
+          <select data-set="voice" id="voiceSel"></select></label>
+        <label class="set">Скорость речи
+          <select data-set="rate">${opt(0.7, settings.rate, 'Медленно')}${opt(0.85, settings.rate, 'Спокойно')}${opt(1, settings.rate, 'Обычно')}</select></label>
+        <label class="set row"><input type="checkbox" data-set="autoplay" ${settings.autoplay ? 'checked' : ''}> Автоматически произносить слова</label>
+        <label class="set row"><input type="checkbox" data-set="autonext" ${settings.autonext ? 'checked' : ''}> Переходить дальше после верного ответа</label>
+        <div class="vinfo"><span id="voiceInfo"></span>
+          <button class="btn small" id="testVoice">${icon('speaker')} Проверить: «Afară plouă»</button></div>
+      </div>
+    </details>
   `);
   renderVoiceUI();
 
-  app.querySelectorAll('[data-topic]').forEach(b => b.onclick = () => {
+  rail.querySelectorAll('[data-topic]').forEach(b => b.onclick = () => {
     const id = b.dataset.topic;
     selected = selected.includes(id) ? selected.filter(x => x !== id) : [...selected, id];
     LS.set('topics', selected); renderHome();
   });
-  const all = app.querySelector('[data-all]');
+  const all = rail.querySelector('[data-all]');
   if (all) all.onclick = () => {
     selected = allOn ? [] : TOPICS.map(t => t.id);
     LS.set('topics', selected); renderHome();
   };
+  rail.querySelector('[data-act=settings]').onclick = () => {
+    const d = app.querySelector('.settings');
+    d.open = true; d.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+  const lb = rail.querySelector('[data-act=learned]');
+  if (lb) lb.onclick = () => { last = { mode: 'cards', words: learnedSel }; renderCards(learnedSel, 'Выученные'); };
   app.querySelectorAll('[data-mode]').forEach(b => b.onclick = () =>
     startMode(b.dataset.mode, b.dataset.mode === 'cards' ? selectedWords() : sessionWords()));
-  const lb = app.querySelector('[data-act=learned]');
-  if (lb) lb.onclick = () => { last = { mode: 'cards', words: learnedSel }; renderCards(learnedSel, 'Выученные'); };
+  const hear = app.querySelector('[data-act=hear]');
+  if (hear) hear.onclick = () => Speech.say(feat);
   app.querySelectorAll('[data-set]').forEach(el => el.onchange = () => {
     const k = el.dataset.set;
     settings[k] = el.type === 'checkbox' ? el.checked
@@ -482,6 +720,19 @@ function renderHome() {
     if (k === 'voice') renderVoiceUI();
   });
   app.querySelector('#testVoice').onclick = () => Speech.say({ ro: 'Afară plouă.' });
+}
+
+function plural(n, one, few, many) {
+  const m10 = n % 10, m100 = n % 100;
+  return m10 === 1 && m100 !== 11 ? one : m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14) ? few : many;
+}
+
+// The word shown on the home plate: stays put until it leaves the practice set
+function featuredWord(sel) {
+  if (!sel.length) return null;
+  let w = BY_KEY.get(featuredKey);
+  if (!w || !sel.includes(w)) { w = sessionWords(sel)[0]; featuredKey = w.key; }
+  return w;
 }
 
 function renderVoiceUI() {
@@ -517,6 +768,35 @@ function startMode(mode, words) {
   if (mode === 'match-ru' || mode === 'match-pic') return startMatch(mode, words);
   startQuiz(mode, words);
 }
+
+/* ================= session rail ================= */
+function sessionRail(mode, done, total, ok, bad, keys) {
+  setRail(`
+    ${brand()}
+    <div class="session">
+      <div class="mode">${esc(MODE_NAMES[mode] || '')}</div>
+      <div class="count" style="margin-top:14px"><span id="sDone">${done}</span> <small>/ <span id="sTotal">${total}</span></small></div>
+      <div class="rprog"><i id="sProg" style="width:${total ? Math.round(done / total * 100) : 0}%"></i></div>
+    </div>
+    <div class="tally">
+      <div class="okn"><b id="sOk">${ok}</b><span id="sOkL">${okLabel(ok)}</span></div>
+      <div class="badn"><b id="sBad">${bad}</b><span id="sBadL">${badLabel(bad)}</span></div>
+    </div>
+    ${keys ? `<div class="keys">${keys}</div>` : ''}
+    <div class="rail-foot"><button class="rbtn" data-act="menu">${icon('back')} Завершить <kbd>Esc</kbd></button></div>
+  `, true);
+}
+const okLabel = n => plural(n, 'верный ответ', 'верных ответа', 'верных ответов');
+const badLabel = n => plural(n, 'ошибка', 'ошибки', 'ошибок');
+const setScore = (ok, bad) => {
+  const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+  set('sOk', ok); set('sBad', bad); set('sOkL', okLabel(ok)); set('sBadL', badLabel(bad));
+};
+const setProgress = (done, total) => {
+  const d = document.getElementById('sDone'), t = document.getElementById('sTotal'), p = document.getElementById('sProg');
+  if (d) d.textContent = done; if (t) t.textContent = total;
+  if (p) p.style.width = (total ? Math.round(done / total * 100) : 0) + '%';
+};
 
 /* ================= quiz ================= */
 let Q = null;
@@ -562,6 +842,8 @@ function startQuiz(mode, words) {
     answered: false, timer: null,
   };
   screen = 'quiz';
+  const keys = `<kbd>1–${settings.options}</kbd><span>ответ</span><kbd>Enter</kbd><span>дальше</span><kbd>R</kbd><span>повторить звук</span>`;
+  sessionRail(mode, 0, Q.queue.length, 0, 0, keys);
   renderQuestion();
 }
 
@@ -575,53 +857,49 @@ function buildOptions(w, type) {
   return shuffle([w, ...cand.slice(0, n - 1)]);
 }
 
-function topBar(progress, ok, bad) {
-  return `<div class="qbar">
-    <button class="x" data-act="menu" title="В меню (Esc)">✕</button>
-    <div class="prog"><i style="width:${Math.round(progress * 100)}%"></i></div>
-    <div class="score"><span class="o">✓ ${ok}</span><span class="b">✗ ${bad}</span></div>
-  </div>`;
-}
-
 function requeue(w, type) {
   const r = Q.retries.get(w.key) || 0;
   if (r >= 2) return;
   Q.retries.set(w.key, r + 1);
   const pos = Math.min(Q.queue.length, Q.i + 3 + (Math.random() * 3 | 0));
   Q.queue.splice(pos, 0, { w, type: Q.mode === 'mix' ? mixType(w) : type });
+  setProgress(Q.i, Q.queue.length);
 }
-const setScore = (ok, bad) => {
-  app.querySelector('.score').innerHTML = `<span class="o">✓ ${ok}</span><span class="b">✗ ${bad}</span>`;
-};
+
+// The question plate: same frame for every type, only the tile and the text change
+function questionPlate(w, type) {
+  if (type === 'ru-ro') return `<div class="tile apricot" aria-hidden="true">?</div>
+    <div><div class="word ru" style="--fs:${wordSize(w.ru, FS_RU)}">${esc(w.ru)}</div></div>`;
+  if (type === 'pic-ro') return `<div class="tile pistachio" aria-hidden="true">${w.img ? picHTML(w) : `<span class="emo">${esc(w.pic)}</span>`}</div>
+    <div><div class="word ru" style="--fs:${wordSize(w.ru, FS_RU)}">${esc(w.ru)}</div>${w.tag ? `<div class="sub">${esc(w.tag)}</div>` : ''}</div>`;
+  if (type === 'audio-ru') return `${sayBtn(w, 'tile lemon')}
+    <div><div class="word ru" style="--fs:56">Послушайте</div><div class="sub">Нажмите на динамик или <kbd>R</kbd>, чтобы услышать ещё раз</div></div>`;
+  return `<div class="tile" style="background:${topicColor(w.topic)}" aria-hidden="true">${esc(initial(w.ro))}</div>
+    <div><div class="word" style="--fs:${wordSize(w.ro, FS_PLATE)}">${esc(w.ro)} ${sayBtn(w)}</div></div>`;
+}
 
 function renderQuestion() {
   clearTimeout(Q.timer);
   sayRegistry = [];
+  setProgress(Q.i, Q.queue.length);
   const item = Q.queue[Q.i];
   if (item.type === 'match') return renderMixPairs(item);
   const { w, type } = item;
   item.opts = item.opts || buildOptions(w, type);
   Q.answered = false;
 
-  let prompt = '';
-  if (type === 'ro-ru' || type === 'ro-pic') prompt = `<div class="qword">${esc(w.ro)} ${sayBtn(w)}</div>`;
-  else if (type === 'ru-ro') prompt = `<div class="qword ru">${esc(w.ru)}</div>`;
-  else if (type === 'pic-ro') prompt = `${picHTML(w, 'lg')}<div class="qword ru">${esc(w.ru)}</div>`;
-  else if (type === 'audio-ru') prompt = sayBtn(w, 'big');
-
   const isPicOpts = type === 'ro-pic';
-  const optLabel = o => type === 'ro-pic' ? `${picHTML(o)}<span class="cap">${esc(o.ru)}</span>` : (type === 'ru-ro' || type === 'pic-ro') ? esc(o.ro) : esc(o.ru);
+  const roOpts = type === 'ru-ro' || type === 'pic-ro';
+  const optLabel = o => isPicOpts ? `${picHTML(o)}<span class="cap">${esc(o.ru)}</span>` : `<span>${esc(roOpts ? o.ro : o.ru)}</span>`;
 
   setHTML(`
-    ${topBar(Q.i / Q.queue.length, Q.ok, Q.bad)}
-    <div class="hint">${PROMPTS[type]}</div>
-    <div class="qcard">${prompt}</div>
-    <div class="opts ${isPicOpts ? 'pics' : ''}">
-      ${item.opts.map((o, i) => `<button class="opt" data-i="${i}"><span class="k">${i + 1}</span>${optLabel(o)}</button>`).join('')}
+    <div class="qhead"><span class="prompt">${PROMPTS[type]}</span></div>
+    <section class="qplate">${questionPlate(w, type)}<div class="qemo" id="qemo" aria-hidden="true"></div></section>
+    <div class="opts ${isPicOpts ? 'pics' : ''} ${item.opts.length === 6 && !isPicOpts ? 'six' : ''}">
+      ${item.opts.map((o, i) => `<button class="opt ${roOpts ? 'ro' : ''}" data-i="${i}"><span class="k">${i + 1}</span>${optLabel(o)}</button>`).join('')}
     </div>
     <div class="after" id="after"></div>
   `);
-  app.querySelector('[data-act=menu]').onclick = renderHome;
   app.querySelectorAll('.opt').forEach(b => b.onclick = () => answer(+b.dataset.i));
 
   if (settings.autoplay && (type === 'ro-ru' || type === 'ro-pic' || type === 'audio-ru')) {
@@ -640,8 +918,8 @@ function answer(idx) {
 
   app.querySelectorAll('.opt').forEach((b, i) => {
     b.disabled = true;
-    if (item.opts[i] === w) b.classList.add('right');
-    else if (i === idx) b.classList.add('wrong');
+    if (item.opts[i] === w) { b.classList.add('right'); b.insertAdjacentHTML('beforeend', stamp(true, icon('check'), 'sm land')); }
+    else if (i === idx) { b.classList.add('wrong'); b.insertAdjacentHTML('beforeend', stamp(false, icon('x'), 'sm land')); }
     else b.classList.add('dim');
   });
 
@@ -654,27 +932,34 @@ function answer(idx) {
 
   if (settings.autoplay && (type === 'ru-ro' || type === 'pic-ro' || !ok)) Speech.say(w);
 
+  const qemo = document.getElementById('qemo');
+  if (qemo && hasPic(w) && type !== 'pic-ro') {
+    qemo.innerHTML = w.img ? picHTML(w) : esc(w.pic);
+    qemo.classList.add('in');
+  }
   const after = document.getElementById('after');
   after.innerHTML = `
     <div class="reveal ${ok ? 'ok' : 'bad'}">
-      ${picHTML(w, 'sm')}
+      ${stamp(ok, ok ? 'FB' : icon('x'), 'land')}
       <div class="info">
         <div class="verdict">${ok ? 'Верно!' : 'Неверно'}</div>
-        <div><b>${esc(w.ro)}</b> ${w.tr ? `<span class="tr">[${esc(w.tr)}]</span>` : ''} — ${esc(w.ru)}</div>
+        <div class="line"><b>${esc(w.ro)}</b> ${w.tr ? `<span class="tr">[${esc(w.tr)}]</span>` : ''} — ${esc(w.ru)}</div>
         ${w.note ? `<div class="tr">${esc(w.note)}</div>` : ''}
-        ${w.ex ? `<div class="ex" data-ex title="Послушать пример">🔊 ${esc(w.ex)} — ${esc(w.exRu || '')}</div>` : ''}
+        ${w.ex ? `<button class="ex" data-ex title="Послушать пример">${icon('speaker')}<span>${esc(w.ex)} — ${esc(w.exRu || '')}</span></button>` : ''}
       </div>
+      ${type !== 'pic-ro' ? picHTML(w, 'sm mob') : ''}
       ${sayBtn(w)}
     </div>
     <div class="nextrow">
       ${learnBox(w)}
-      <span class="keys">Клавиши: 1–${item.opts.length} — ответ, Enter — дальше, R — повторить звук</span>
-      <button class="btn primary" data-act="next">Дальше →</button>
+      <button class="btn primary" data-act="next">Дальше ${icon('arrow')}</button>
     </div>`;
   bindSay(); bindLearn();
   const ex = after.querySelector('[data-ex]');
   if (ex) ex.onclick = () => Speech.say({ ro: w.ex });
   after.querySelector('[data-act=next]').onclick = nextQuestion;
+  const r = after.getBoundingClientRect();
+  if (r.bottom > innerHeight) after.scrollIntoView({ behavior: 'smooth', block: 'end' });
   if (ok && settings.autonext) Q.timer = setTimeout(nextQuestion, 1300);
 }
 
@@ -682,11 +967,9 @@ function renderMixPairs(item) {
   Q.answered = false;
   const board = matchBoard(item.words, item.kind);
   setHTML(`
-    ${topBar(Q.i / Q.queue.length, Q.ok, Q.bad)}
-    <div class="hint">Соедините пары</div>
+    <div class="qhead"><span class="prompt">Соедините пары: слово и ${item.kind === 'pic' ? 'картинку с переводом' : 'перевод'}</span></div>
     ${board.html}
   `);
-  app.querySelector('[data-act=menu]').onclick = renderHome;
   const missed = new Set();
   board.bind({
     onHit(w) {
@@ -710,7 +993,7 @@ function nextQuestion() {
   clearTimeout(Q.timer);
   Q.i++;
   if (Q.i >= Q.queue.length) {
-    renderResults({ good: Q.firstOk, total: Q.words.length, mistakes: [...Q.mistakes], unit: 'с первой попытки' });
+    renderResults({ good: Q.firstOk, total: Q.words.length, mistakes: [...Q.mistakes], unit: 'с первой попытки', ok: Q.ok, bad: Q.bad });
   } else renderQuestion();
 }
 
@@ -732,22 +1015,23 @@ function startMatch(mode, words) {
   }
   M = { mode, kind, words, chunks, ci: 0, ok: 0, bad: 0, mistakes: new Set() };
   screen = 'match';
+  sessionRail(mode, 0, words.length, 0, 0, '');
   renderMatch();
 }
 
 function renderMatch() {
   sayRegistry = [];
   const ch = M.chunks[M.ci];
-  const progress = M.chunks.slice(0, M.ci).reduce((s, c) => s + c.length, 0) / M.words.length;
+  const before = M.chunks.slice(0, M.ci).reduce((s, c) => s + c.length, 0);
+  let matched = 0;
+  setProgress(before, M.words.length);
   const board = matchBoard(ch, M.kind);
   setHTML(`
-    ${topBar(progress, M.ok, M.bad)}
-    <div class="hint">Соедините пары · раунд ${M.ci + 1} из ${M.chunks.length}</div>
+    <div class="qhead"><span class="prompt">Соедините пары · раунд ${M.ci + 1} из ${M.chunks.length}</span></div>
     ${board.html}
   `);
-  app.querySelector('[data-act=menu]').onclick = renderHome;
   board.bind({
-    onHit(w) { M.ok++; if (!M.mistakes.has(w)) record(w, true); setScore(M.ok, M.bad); },
+    onHit(w) { M.ok++; if (!M.mistakes.has(w)) record(w, true); setScore(M.ok, M.bad); setProgress(before + ++matched, M.words.length); },
     onMiss(w) { M.bad++; if (!M.mistakes.has(w)) record(w, false); M.mistakes.add(w); setScore(M.ok, M.bad); },
     onDone() {
       setTimeout(() => {
@@ -755,7 +1039,7 @@ function renderMatch() {
         M.ci++;
         if (M.ci < M.chunks.length) renderMatch();
         else renderResults({ good: M.words.length - M.mistakes.size, total: M.words.length,
-          mistakes: [...M.mistakes], unit: 'без ошибок' });
+          mistakes: [...M.mistakes], unit: 'без ошибок', ok: M.ok, bad: M.bad });
       }, 600);
     },
   });
@@ -766,11 +1050,11 @@ function renderMatch() {
 function matchBoard(words, kind) {
   const left = shuffle(words), right = shuffle(words);
   const html = `<div class="match">
-    <div class="col">${left.map((w, i) => `<div class="lrow">${learnBox(w, false)}<button class="mi" data-side="L" data-i="${i}">${esc(w.ro)}</button></div>`).join('')}</div>
-    <div class="col">${right.map((w, i) => `<button class="mi ${kind === 'pic' ? 'p' : ''}" data-side="R" data-i="${i}">${
+    <div class="col">${left.map((w, i) => `<div class="lrow">${learnBox(w, false)}<button class="mi ro" data-side="L" data-i="${i}">${esc(w.ro)}</button></div>`).join('')}</div>
+    <div class="col">${right.map((w, i) => `<button class="mi" data-side="R" data-i="${i}">${
       kind === 'pic' ? `<span class="pr">${picHTML(w, 'xs')}<span>${esc(w.ru)}</span></span>` : esc(w.ru)}</button>`).join('')}</div>
   </div>
-  <div class="lhint">☑ слева — отметить слово как выученное: оно больше не будет попадаться в упражнениях</div>`;
+  <div class="lhint">Галочка слева от слова — «выучено»: слово больше не будет попадаться в упражнениях.</div>`;
   const bind = ({ onHit, onMiss, onDone }) => {
     const done = new Set();
     let sel = null;
@@ -790,6 +1074,7 @@ function matchBoard(words, kind) {
       if (a.w === w) {
         done.add(w);
         a.el.classList.add('done'); el.classList.add('done');
+        (side === 'R' ? el : a.el).insertAdjacentHTML('beforeend', stamp(true, icon('check'), 'sm land'));
         onHit(w);
         if (done.size === words.length) onDone();
       } else {
@@ -807,32 +1092,39 @@ let cardHide = LS.get('cardHide', 'none');   // 'none' | 'ru' | 'ro'
 function renderCards(words, title = 'Карточки') {
   screen = 'cards';
   sayRegistry = [];
-  const sorted = words.slice().sort((a, b) => selectedWords().indexOf(a) - selectedWords().indexOf(b));
-  const tbtn = (v, label) => `<button class="btn small ${cardHide === v ? 'on' : ''}" data-hide="${v}">${label}</button>`;
-  setHTML(`
-    <div class="qbar"><button class="x" data-act="menu" title="В меню">✕</button>
-      <h1 style="font-size:20px;flex:1">${esc(title)} · ${sorted.length}</h1></div>
-    <div class="toolbar">
+  const order = selectedWords();
+  const sorted = words.slice().sort((a, b) => order.indexOf(a) - order.indexOf(b));
+  const tbtn = (v, label) => `<button class="rbtn ${cardHide === v ? 'on' : ''}" data-hide="${v}" aria-pressed="${cardHide === v}">${label}</button>`;
+  setRail(`
+    ${brand()}
+    <div class="session">
+      <div class="mode">${esc(title)}</div>
+      <div class="count" style="margin-top:14px">${sorted.length} <small>${plural(sorted.length, 'слово', 'слова', 'слов')}</small></div></div>
+    <div style="display:flex;flex-direction:column;gap:8px">
       ${tbtn('none', 'Показать всё')}${tbtn('ru', 'Скрыть перевод')}${tbtn('ro', 'Скрыть румынский')}
-      <span class="muted" style="font-size:13px;align-self:center">Нажмите на размытый текст, чтобы открыть</span>
     </div>
+    <div class="rnote">Нажмите на размытый текст, чтобы открыть его.</div>
+    <div class="rail-foot"><button class="rbtn" data-act="menu">${icon('back')} В меню <kbd>Esc</kbd></button></div>
+  `, true);
+  setHTML(`
     <div class="cards">
       ${sorted.map((w, i) => {
         const s = stats[w.key];
-        return `<div class="card ${isLearned(w) ? 'learned' : ''}" data-key="${esc(w.key)}">
-          ${picHTML(w)}
-          <div class="cro"><span class="${cardHide === 'ro' ? 'hidden-txt' : ''}">${esc(w.ro)}
-            ${w.tr ? `<span class="tr">[${esc(w.tr)}]</span>` : ''}</span>${sayBtn(w)}</div>
-          <div class="cru ${cardHide === 'ru' ? 'hidden-txt' : ''}">${esc(w.ru)}</div>
-          ${w.note ? `<div class="note ${cardHide === 'ru' ? 'hidden-txt' : ''}">${esc(w.note)}</div>` : ''}
-          ${w.ex ? `<div class="ex" data-ex="${i}">🔊 ${esc(w.ex)}<br><span class="${cardHide === 'ru' ? 'hidden-txt' : ''}">${esc(w.exRu || '')}</span></div>` : ''}
-          <div class="st">${learnBox(w)}${s ? ` · ✓ ${s.c} · ✗ ${s.w}` : ''}</div>
-        </div>`;
+        return `<article class="card ${isLearned(w) ? 'learned' : ''}" data-key="${esc(w.key)}" style="--c:${topicColor(w.topic)}">
+          <div class="top">${hasPic(w) ? picHTML(w, 'card') : `<span class="nopic" aria-hidden="true">${esc(initial(w.ro))}</span>`}</div>
+          <div class="body">
+            <div class="cro"><span class="${cardHide === 'ro' ? 'hidden-txt' : ''}">${esc(w.ro)}
+              ${w.tr ? `<span class="tr">[${esc(w.tr)}]</span>` : ''}</span>${sayBtn(w, 'sm')}</div>
+            <div class="cru ${cardHide === 'ru' ? 'hidden-txt' : ''}">${esc(w.ru)}</div>
+            ${w.note ? `<div class="note ${cardHide === 'ru' ? 'hidden-txt' : ''}">${esc(w.note)}</div>` : ''}
+            ${w.ex ? `<button class="ex" data-ex="${i}">${icon('speaker')}<span>${esc(w.ex)}<br><span class="${cardHide === 'ru' ? 'hidden-txt' : ''}">${esc(w.exRu || '')}</span></span></button>` : ''}
+            <div class="st">${learnBox(w)}${s ? `<span>✓ ${s.c} · ✗ ${s.w}</span>` : ''}</div>
+          </div>
+        </article>`;
       }).join('')}
     </div>
   `);
-  app.querySelector('[data-act=menu]').onclick = renderHome;
-  app.querySelectorAll('[data-hide]').forEach(b => b.onclick = () => {
+  rail.querySelectorAll('[data-hide]').forEach(b => b.onclick = () => {
     cardHide = b.dataset.hide; LS.set('cardHide', cardHide); renderCards(words, title);
   });
   app.querySelectorAll('.hidden-txt').forEach(el => el.onclick = e => { e.stopPropagation(); el.classList.remove('hidden-txt'); });
@@ -844,22 +1136,38 @@ function renderResults(r) {
   screen = 'results';
   sayRegistry = [];
   const pct = r.total ? Math.round(r.good / r.total * 100) : 0;
-  const emoji = pct === 100 ? '🏆' : pct >= 80 ? '🎉' : pct >= 50 ? '👍' : '💪';
+  const gr = grade(pct);
+  LS.set('lastResult', { pct, good: r.good, total: r.total, unit: r.unit, at: Date.now() });
+  setRail(`
+    ${brand()}
+    <div class="session">
+      <div class="mode">${esc(MODE_NAMES[last.mode] || '')}</div>
+      <div class="count" style="margin-top:14px">${r.good} <small>/ ${r.total}</small></div>
+      <div class="rprog"><i style="width:${pct}%"></i></div></div>
+    <div class="tally">
+      <div class="okn"><b>${r.ok}</b><span>${okLabel(r.ok)}</span></div>
+      <div class="badn"><b>${r.bad}</b><span>${badLabel(r.bad)}</span></div>
+    </div>
+    <div class="rail-foot"><button class="rbtn" data-act="menu">${icon('back')} В меню <kbd>Esc</kbd></button></div>
+  `, true);
   setHTML(`
-    <div class="res">
-      <div class="big">${emoji}</div>
-      <h1>${pct}%</h1>
-      <p class="muted">${r.good} из ${r.total} ${r.unit}</p>
-      ${r.mistakes.length ? `<h2>Стоит повторить</h2><div class="mlist">
-        ${r.mistakes.map(w => `<div class="mrow">${picHTML(w, 'xs')}
-          <div class="w"><b>${esc(w.ro)}</b> ${w.tr ? `<span class="tr">[${esc(w.tr)}]</span>` : ''}<br>
-          <span class="muted">${esc(w.ru)}</span></div>${sayBtn(w)}</div>`).join('')}
-      </div>` : '<p>Без единой ошибки! 👏</p>'}
-      <div class="btns">
-        ${r.mistakes.length ? '<button class="btn primary" data-act="retry">Повторить ошибки</button>' : ''}
-        <button class="btn ${r.mistakes.length ? '' : 'primary'}" data-act="again">Ещё раз</button>
-        <button class="btn" data-act="menu">В меню</button>
+    <section class="result">
+      ${stamp(gr.ok, esc(gr.g), 'xl land')}
+      <div>
+        <h1>${esc(gr.name)}</h1>
+        <div class="gname">${esc(gr.ru)}</div>
+        <div class="score"><b>${r.good}</b> из <b>${r.total}</b> ${esc(r.unit)} · ${pct}%</div>
       </div>
+    </section>
+    ${r.mistakes.length ? `<h2 class="sec">Стоит повторить</h2><div class="mlist">
+      ${r.mistakes.map(w => `<div class="mrow">${picHTML(w, 'xs')}
+        <div class="w"><b>${esc(w.ro)}</b> ${w.tr ? `<span class="tr">[${esc(w.tr)}]</span>` : ''}<br>
+        <span class="tr" style="font-size:15px">${esc(w.ru)}</span></div>${sayBtn(w, 'sm')}</div>`).join('')}
+    </div>` : '<p class="score">Без единой ошибки.</p>'}
+    <div class="btns">
+      ${r.mistakes.length ? `<button class="btn primary" data-act="retry">Повторить ошибки</button>` : ''}
+      <button class="btn ${r.mistakes.length ? '' : 'primary'}" data-act="again">Ещё раз</button>
+      <button class="btn" data-act="menu">В меню</button>
     </div>
   `);
   app.querySelector('[data-act=menu]').onclick = renderHome;
@@ -890,6 +1198,7 @@ document.addEventListener('keydown', e => {
 
 Speech.load();
 renderHome();
+if (document.fonts) document.fonts.ready.then(fitWords);
 </script>
 </body>
 </html>
