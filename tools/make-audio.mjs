@@ -41,8 +41,11 @@ const used = new Set();
 for (const text of texts) {
   if (prev[text]) { map[text] = prev[text]; used.add(prev[text]); }
 }
+// texts without an earlier recording; a file already at their path belongs to an old text
+const fresh = new Set();
 for (const text of texts) {
   if (map[text]) continue;
+  fresh.add(text);
   let name = slug(text), file, n = 1;
   do { file = `audio/${name}${n > 1 ? '-' + n : ''}.mp3`; n++; } while (used.has(file));
   map[text] = file; used.add(file);
@@ -52,7 +55,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 let downloaded = 0, failed = [];
 for (const [text, file] of Object.entries(map)) {
   const path = join(root, file);
-  if (existsSync(path) && statSync(path).size > 1000) continue;
+  if (!fresh.has(text) && existsSync(path) && statSync(path).size > 1000) continue;
   const url = 'https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=ro&q=' + encodeURIComponent(text);
   let ok = false;
   for (let attempt = 1; attempt <= 3 && !ok; attempt++) {
