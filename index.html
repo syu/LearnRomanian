@@ -248,7 +248,9 @@
   .mi.wrong { border-color: var(--brick); background: var(--brick-soft); animation: shake .35s; }
   .mi .pr { display: flex; align-items: center; justify-content: center; gap: 12px; }
   @keyframes shake { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
-  .lhint { margin-top: 14px; font-size: 13px; color: var(--muted); }
+  .lhint { font-size: 13px; color: var(--muted); }
+  .match + .nextrow { margin-top: 18px; }
+  .mi.gone { opacity: .4; }
 
   /* ---------- cards ---------- */
   .cards { margin-top: 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 16px; }
@@ -500,7 +502,8 @@ function bindSay(root = app) {
     b.addEventListener('click', e => { e.stopPropagation(); Speech.say(sayRegistry[+b.dataset.say]); });
   });
 }
-function setHTML(html) { if (screen !== 'home') app.classList.remove('home'); app.innerHTML = html; bindSay(); bindLearn(); fitWords(); window.scrollTo(0, 0); }
+let activeBoard = null;   // the pairs board on screen, so "learned" can take a pair out of it
+function setHTML(html) { activeBoard = null; if (screen !== 'home') app.classList.remove('home'); app.innerHTML = html; bindSay(); bindLearn(); fitWords(); window.scrollTo(0, 0); }
 // Shrink big words until the longest one fits its column (no mid-word breaks)
 function fitWords() {
   app.querySelectorAll('.word').forEach(el => {
@@ -544,6 +547,7 @@ function setLearned(w, on) {
   app.querySelectorAll(`.card[data-key="${CSS.escape(w.key)}"]`).forEach(c => c.classList.toggle('learned', on));
   // drop the word's remaining single questions from the current session
   if (on && screen === 'quiz' && Q) Q.queue = Q.queue.filter((it, i) => i <= Q.i || it.w !== w);
+  if (on && activeBoard) activeBoard.learned(w);
   if (on) toast(`«${w.ro}» — выучено, в упражнениях больше не будет`, 2000);
 }
 
@@ -984,7 +988,7 @@ function renderMixPairs(item) {
       missed.add(w); Q.mistakes.add(w); Q.seen.add(w.key);
       setScore(Q.ok, Q.bad);
     },
-    onDone() { Q.answered = true; Q.timer = setTimeout(nextQuestion, 600); },
+    onDone(skipped) { Q.answered = true; Q.timer = setTimeout(nextQuestion, skipped.length ? 0 : 600); },
   });
 }
 
@@ -1013,7 +1017,7 @@ function startMatch(mode, words) {
     if (!c) { c = []; chunks.push(c); }
     c.push(w);
   }
-  M = { mode, kind, words, chunks, ci: 0, ok: 0, bad: 0, mistakes: new Set() };
+  M = { mode, kind, words, chunks, ci: 0, ok: 0, bad: 0, mistakes: new Set(), skipped: new Set() };
   screen = 'match';
   sessionRail(mode, 0, words.length, 0, 0, '');
   renderMatch();
@@ -1033,14 +1037,15 @@ function renderMatch() {
   board.bind({
     onHit(w) { M.ok++; if (!M.mistakes.has(w)) record(w, true); setScore(M.ok, M.bad); setProgress(before + ++matched, M.words.length); },
     onMiss(w) { M.bad++; if (!M.mistakes.has(w)) record(w, false); M.mistakes.add(w); setScore(M.ok, M.bad); },
-    onDone() {
+    onDone(skipped) {
+      skipped.forEach(w => M.skipped.add(w));
       setTimeout(() => {
         if (screen !== 'match') return;
         M.ci++;
         if (M.ci < M.chunks.length) renderMatch();
-        else renderResults({ good: M.words.length - M.mistakes.size, total: M.words.length,
-          mistakes: [...M.mistakes], unit: 'без ошибок', ok: M.ok, bad: M.bad });
-      }, 600);
+        else renderResults({ good: M.words.filter(w => !M.mistakes.has(w) && !M.skipped.has(w)).length,
+          total: M.words.length, mistakes: [...M.mistakes], unit: 'без ошибок', ok: M.ok, bad: M.bad });
+      }, skipped.length ? 0 : 600);
     },
   });
 }
@@ -1054,10 +1059,27 @@ function matchBoard(words, kind) {
     <div class="col">${right.map((w, i) => `<button class="mi" data-side="R" data-i="${i}">${
       kind === 'pic' ? `<span class="pr">${picHTML(w, 'xs')}<span>${esc(w.ru)}</span></span>` : esc(w.ru)}</button>`).join('')}</div>
   </div>
-  <div class="lhint">Галочка слева от слова — «выучено»: слово больше не будет попадаться в упражнениях.</div>`;
+  <div class="nextrow">
+    <span class="lhint">Галочка слева от слова — «выучено»: пара уходит из раунда, а слово больше не будет попадаться в упражнениях.</span>
+    <button class="btn primary" data-act="skip">Дальше ${icon('arrow')}</button>
+  </div>`;
+  // onDone(skipped): skipped = words left unmatched when "Дальше" was pressed
   const bind = ({ onHit, onMiss, onDone }) => {
     const done = new Set();
-    let sel = null;
+    let sel = null, finished = false;
+    const finish = skipped => { if (finished) return; finished = true; activeBoard = null; onDone(skipped); };
+    const elsOf = w => [left.indexOf(w), right.indexOf(w)].map((i, n) =>
+      app.querySelector(`.mi[data-side="${n ? 'R' : 'L'}"][data-i="${i}"]`));
+    activeBoard = {
+      learned(w) {
+        if (!words.includes(w) || done.has(w)) return;
+        done.add(w);
+        elsOf(w).forEach(el => { el.classList.remove('sel'); el.classList.add('done', 'gone'); });
+        if (sel && sel.w === w) sel = null;
+        if (done.size === words.length) finish([]);
+      },
+    };
+    app.querySelector('[data-act=skip]').onclick = () => finish(words.filter(w => !done.has(w)));
     app.querySelectorAll('.mi').forEach(el => el.onclick = () => {
       const side = el.dataset.side;
       const w = (side === 'L' ? left : right)[+el.dataset.i];
@@ -1076,7 +1098,7 @@ function matchBoard(words, kind) {
         a.el.classList.add('done'); el.classList.add('done');
         (side === 'R' ? el : a.el).insertAdjacentHTML('beforeend', stamp(true, icon('check'), 'sm land'));
         onHit(w);
-        if (done.size === words.length) onDone();
+        if (done.size === words.length) finish([]);
       } else {
         onMiss(side === 'L' ? w : a.w);
         [a.el, el].forEach(e => { e.classList.add('wrong'); setTimeout(() => e.classList.remove('wrong'), 450); });
@@ -1188,9 +1210,13 @@ document.addEventListener('keydown', e => {
   if (screen === 'home' && e.key === 'Enter' && e.target === document.body && practiceWords().length >= 2) {
     startMode('mix', sessionWords()); return;
   }
+  const onBoard = screen === 'match' || (screen === 'quiz' && Q.queue[Q.i].type === 'match');
+  if (onBoard) {
+    if (e.key === 'Enter') { const b = app.querySelector('[data-act=skip]'); if (b) { e.preventDefault(); b.click(); } }
+    return;
+  }
   if (screen !== 'quiz') return;
   const item = Q.queue[Q.i];
-  if (item.type === 'match') return;
   if (/^[1-9]$/.test(e.key) && !Q.answered) { answer(+e.key - 1); e.preventDefault(); }
   else if ((e.key === 'Enter' || e.key === ' ' || e.key === 'ArrowRight') && Q.answered) { nextQuestion(); e.preventDefault(); }
   else if (e.code === 'KeyR') Speech.say(item.w);
