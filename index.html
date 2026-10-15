@@ -387,7 +387,7 @@ const icon = (name, cls = '') => `<svg class="ico ${cls}" viewBox="0 0 24 24" ar
 
 /* ================= data ================= */
 const TOPICS = (window.TOPICS || []).map(t => ({
-  ...t, words: t.words.map(w => ({ ...w, topic: t.id, key: t.id + '|' + w.ro })),
+  ...t, words: t.words.map(w => ({ ...w, topic: t.id, key: w.ro })),
 }));
 const ALL = TOPICS.flatMap(t => t.words);
 const CRAYONS = ['var(--lavender)', 'var(--apricot)', 'var(--pistachio)', 'var(--lemon)', 'var(--mint)', 'var(--lime)'];
@@ -397,12 +397,30 @@ const settings = Object.assign(
   { options: 4, length: 'all', autoplay: true, autonext: true, voice: 'auto', rate: 0.85 },
   LS.get('settings', {})
 );
-let selected = LS.get('topics', []).filter(id => TOPICS.some(t => t.id === id));
+// "baza" was split into saluturi, politete and oras
+let selected = LS.get('topics', []).flatMap(id => id === 'baza' ? ['saluturi', 'politete', 'oras'] : [id])
+  .filter((id, i, a) => TOPICS.some(t => t.id === id) && a.indexOf(id) === i);
 if (!selected.length && TOPICS.length) selected = [TOPICS[0].id];
-const stats = LS.get('stats', {});
 const BY_KEY = new Map(ALL.map(w => [w.key, w]));
+// A word's key is the Romanian word itself, so stats survive moving it to another topic.
+// Older versions stored "topic|word"; merge those into the plain key once.
+const plainKey = k => k.includes('|') ? k.slice(k.indexOf('|') + 1) : k;
+const stats = (() => {
+  const raw = LS.get('stats', {}), out = {};
+  for (const [k, v] of Object.entries(raw)) {
+    const s = out[plainKey(k)] || (out[plainKey(k)] = { c: 0, w: 0 });
+    s.c += v.c || 0; s.w += v.w || 0;
+  }
+  if (Object.keys(raw).some(k => k.includes('|'))) LS.set('stats', out);
+  return out;
+})();
 // Words marked as learned are left out of all exercises (cards still show them).
-const learned = new Set(LS.get('learned', []).filter(k => BY_KEY.has(k)));
+const learned = (() => {
+  const raw = LS.get('learned', []);
+  const set = new Set(raw.map(plainKey).filter(k => BY_KEY.has(k)));
+  if (raw.some(k => k.includes('|'))) LS.set('learned', [...set]);
+  return set;
+})();
 const isLearned = w => learned.has(w.key);
 
 const saveSettings = () => LS.set('settings', settings);
