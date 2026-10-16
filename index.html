@@ -15,7 +15,7 @@
     --line: #d8e9e5; --line-strong: #b9d5cf;
     --teal: #155e63; --teal-soft: #dcf0eb; --teal-ring: #5fb3ad;
     --brick: #c0412a; --brick-soft: #fbe7e1;
-    --lavender: #cbb8f0; --apricot: #ffc8a2; --pistachio: #cfe8a9; --lemon: #fff1a8; --lime: #e4f09b; --mint: #bfe6dc;
+    --lavender: #cbb8f0; --apricot: #ffc8a2; --pistachio: #cfe8a9; --lemon: #fff1a8; --lime: #e4f09b; --mint: #bfe6dc; --sky: #b8dcf6;
     --word: "Rubik", system-ui, sans-serif;
     --ui: "Golos Text", system-ui, sans-serif;
     --emoji: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
@@ -69,6 +69,10 @@
   .trow .lk { color: var(--pistachio); margin-right: 8px; display: inline-flex; align-items: center; gap: 2px; }
   .trow .lk .ico { width: 13px; height: 13px; stroke-width: 3; }
   .trow.all { font-weight: 600; }
+  /* a topic with its own colour (Verbe): name and checkbox in that colour */
+  .trow.own .nm { color: var(--tc); font-weight: 600; }
+  .trow.own .cb { border-color: var(--tc); }
+  .trow.own.on .cb { background: var(--tc); border-color: var(--tc); }
   .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
 
   .session .mode { font: 700 22px/1.15 var(--word); }
@@ -411,7 +415,12 @@ const TOPICS = (window.TOPICS || []).map(t => ({
 }));
 const ALL = TOPICS.flatMap(t => t.words);
 const CRAYONS = ['var(--lavender)', 'var(--apricot)', 'var(--pistachio)', 'var(--lemon)', 'var(--mint)', 'var(--lime)'];
-const topicColor = id => CRAYONS[Math.max(0, TOPICS.findIndex(t => t.id === id)) % CRAYONS.length];
+// A topic with its own colour (t.color) keeps it; the rest take turns through the crayons.
+const topicColor = id => {
+  const t = TOPICS.find(t => t.id === id);
+  if (t && t.color) return `var(--${t.color})`;
+  return CRAYONS[Math.max(0, TOPICS.filter(t => !t.color).indexOf(t)) % CRAYONS.length];
+};
 
 const settings = Object.assign(
   { options: 4, length: 'all', autoplay: true, autonext: true, voice: 'auto', rate: 0.85 },
@@ -420,7 +429,8 @@ const settings = Object.assign(
 // "baza" was split into saluturi, politete and oras
 let selected = LS.get('topics', []).flatMap(id => id === 'baza' ? ['saluturi', 'politete', 'oras'] : [id])
   .filter((id, i, a) => TOPICS.some(t => t.id === id) && a.indexOf(id) === i);
-if (!selected.length && TOPICS.length) selected = [TOPICS[0].id];
+// first visit: start with the first vocabulary topic, not the grammar tables
+if (!selected.length && TOPICS.length) selected = [(TOPICS.find(t => !t.tables) || TOPICS[0]).id];
 const BY_KEY = new Map(ALL.map(w => [w.key, w]));
 // A word's key is the Romanian word itself, so stats survive moving it to another topic.
 // Older versions stored "topic|word"; merge those into the plain key once.
@@ -661,7 +671,8 @@ function renderHome() {
           <span class="cb">${allOn ? icon('check') : selected.length ? icon('minus') : ''}</span>
           <span class="nm">Все темы</span><span class="n">${ALL.length}</span></button>` : ''}
         ${TOPICS.map(t => { const on = selected.includes(t.id); const k = t.words.filter(isLearned).length; return `
-          <button class="trow ${on ? 'on' : ''}" data-topic="${esc(t.id)}" aria-pressed="${on}">
+          <button class="trow ${on ? 'on' : ''} ${t.color ? 'own' : ''}" data-topic="${esc(t.id)}" aria-pressed="${on}"
+            ${t.color ? `style="--tc:var(--${esc(t.color)})"` : ''}>
             <span class="cb">${on ? icon('check') : ''}</span>
             <span class="nm">${esc(t.name)}<small>${esc(t.ru || '')}</small></span>
             <span class="n">${k ? `<span class="lk" title="выучено">${icon('check')}${k}</span>` : ''}${t.words.length}</span>

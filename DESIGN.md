@@ -17,6 +17,7 @@ colors:
   lemon: "#fff1a8"
   lime: "#e4f09b"
   mint: "#bfe6dc"
+  sky: "#b8dcf6"
   page: "#f4fbf9"
   paper: "#ffffff"
   ink: "#14262b"
@@ -276,7 +277,7 @@ A circle tilted -12°, drawn as a double ring with a currentColor border plus an
 ### Do:
 - **Do** give every word page the plate: crayon letter tile, Rubik 800 word, emoji, between a 4px ink rule and a hairline.
 - **Do** mark answers with the rotated teacher's stamp and keep it on the option. Teal means right, Brick means wrong.
-- **Do** pick crayon fills by meaning: the topic rotation lavender, apricot, pistachio, lemon, mint, lime, and the question types RU = Apricot, picture = Pistachio, listening = Lemon.
+- **Do** pick crayon fills by meaning: the topic rotation lavender, apricot, pistachio, lemon, mint, lime (a topic may keep its own colour instead: Verbe, the grammar tables topic, is sky), and the question types RU = Apricot, picture = Pistachio, listening = Lemon.
 - **Do** keep one teal primary action per screen and let Enter trigger it.
 - **Do** reserve the heights of the plate and answer panel so the frame never moves between questions.
 - **Do** honour reduced motion. The only motions are the stamp landing, the emoji rising, the pair mismatch shake and the hover lift.
