@@ -337,7 +337,7 @@
     .rail.sess .rbtn { padding: 8px 12px; }
     .page { padding: 22px 16px 40px; }
     .page.home { display: flex; flex-direction: column; }
-    .page.home .start { order: 1; margin-top: 18px; } .page.home .plate, .page.home .vtable { order: 2; }
+    .page.home .start { order: 1; margin-top: 18px; } .page.home .plate { order: 2; }
     .page.home .modes { order: 3; } .page.home .settings { order: 4; } .hintline { display: none; }
     .vtable thead > tr > *, .vtable tbody th { padding-left: 10px; padding-right: 10px; }
     .vtable thead th { font-size: 17px; white-space: normal; } .vtable tbody th { font-size: 15px; }
@@ -689,6 +689,8 @@ function renderHome() {
     </div>
   `);
 
+  // a topic with tables (Verbe) shows them in place of the word of the day
+  const tables = selectedTables();
   const feat = featuredWord(sel);
   const res = LS.get('lastResult', null);
   const topicsCount = selected.length;
@@ -715,15 +717,13 @@ function renderHome() {
       ${res ? `<div class="last">${stamp(grade(res.pct).ok, esc(grade(res.pct).g), 'sm')}
         <span>Прошлое занятие: <b>${esc(grade(res.pct).name)}</b> — ${res.good} из ${res.total} ${esc(res.unit)}</span></div>` : ''}
     </header>
-    ${plate}
+    ${tables.length ? tablesHTML(tables) : plate}
     <button class="start" data-mode="mix" ${sel.length < 2 ? 'disabled' : ''}>
       ${icon('shuffle')}
       <span><b>Начать · Микс</b><span>Все задания вперемешку, включая пары</span></span>
       ${icon('arrow', 'go')}
     </button>
     <div class="hintline">Enter — начать. Во время занятия: <kbd>1</kbd>–<kbd>${settings.options}</kbd> ответ, <kbd>Enter</kbd> дальше, <kbd>R</kbd> звук, <kbd>Esc</kbd> выход.</div>
-
-    ${tablesHTML(selectedTables())}
 
     <section class="modes" aria-label="Другие режимы">
       ${MODE_GROUPS.map(g => `<div class="mgroup"><h3>${g.name}</h3>
