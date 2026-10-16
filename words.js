@@ -18,6 +18,9 @@
 //            вариантами ответа друг для друга и в одном раунде пар (необязательно)
 //    audio — путь к своему mp3 с произношением                    (необязательно)
 //
+//  У темы может быть поле tables — таблицы форм (см. тему Verbe), они
+//  открываются в режиме «Таблицы».
+//
 //  После добавления слов запустите  node tools/make-audio.mjs  — он скачает
 //  записи произношения для новых слов и примеров в папку audio/.
 // =====================================================================
@@ -638,6 +641,98 @@ window.TOPICS = [
       { ro: 'rinichi', ru: 'почка', tr: 'риникь',
         note: 'Мн. ч.: rinichi.',
         ex: 'Avem doi rinichi.', exRu: 'У нас две почки.' },
+    ],
+  },
+
+  {
+    id: 'verbe',
+    name: 'Verbe',
+    ru: 'Глаголы: a fi, a avea',
+    // Таблицы форм — режим «Таблицы». Строка: местоимение, затем формы по столбцам.
+    // Ячейка озвучивается как «местоимение форма» (для «el / ea» — «el …»).
+    tables: [
+      {
+        title: 'a fi · a avea',
+        cols: [
+          { ro: 'a fi', ru: 'быть, сейчас' },
+          { ro: 'a avea', ru: 'иметь, сейчас' },
+          { ro: 'a fi — trecut', ru: 'быть, прошедшее' },
+        ],
+        rows: [
+          ['eu',       'sunt',    'am',    'am fost'],
+          ['tu',       'ești',    'ai',    'ai fost'],
+          ['el / ea',  'este',    'are',   'a fost'],
+          ['noi',      'suntem',  'avem',  'am fost'],
+          ['voi',      'sunteți', 'aveți', 'ați fost'],
+          ['ei / ele', 'sunt',    'au',    'au fost'],
+        ],
+        notes: [
+          'Местоимение обычно опускают: «Sunt student.» — Я студент.',
+          'В разговоре «este» часто сокращают до «e»: «El e acasă.»',
+          'Прошедшее время (perfectul compus) = am, ai, a, am, ați, au + fost. Похоже на «a avea», но: el a (не are), noi am (не avem), voi ați (не aveți).',
+          'ei — они (мужчины или смешанная группа), ele — они (только женщины).',
+        ],
+      },
+    ],
+    words: [
+      { ro: 'eu sunt',            ru: 'я есть',                   tr: 'еу сунт',
+        ex: 'Eu sunt student.', exRu: 'Я студент.' },
+      { ro: 'tu ești',            ru: 'ты есть',                  tr: 'ту ешть',
+        ex: 'Tu ești acasă?', exRu: 'Ты дома?' },
+      { ro: 'el este',            ru: 'он есть',                  tr: 'ел есте',
+        note: 'В разговоре: el e.',
+        ex: 'El este profesor.', exRu: 'Он учитель.' },
+      { ro: 'ea este',            ru: 'она есть',                 tr: 'я есте',
+        note: 'В разговоре: ea e.',
+        ex: 'Ea este profesoară.', exRu: 'Она учительница.' },
+      { ro: 'noi suntem',         ru: 'мы есть',                  tr: 'ной сунтем',
+        ex: 'Noi suntem la curs.', exRu: 'Мы на занятии.' },
+      { ro: 'voi sunteți',        ru: 'вы есть',                  tr: 'вой сунтець',
+        ex: 'Voi sunteți obosiți?', exRu: 'Вы устали?' },
+      { ro: 'ei sunt',            ru: 'они есть',                 tr: 'ей сунт', syn: 'they-are',
+        note: 'ei — мужчины или смешанная группа.',
+        ex: 'Ei sunt prieteni.', exRu: 'Они друзья.' },
+      { ro: 'ele sunt',           ru: 'они (ж.) есть',            tr: 'еле сунт', syn: 'they-are',
+        note: 'ele — только женщины.',
+        ex: 'Ele sunt surori.', exRu: 'Они сёстры.' },
+
+      { ro: 'eu am',              ru: 'у меня есть',              tr: 'еу ам',
+        ex: 'Eu am o pisică.', exRu: 'У меня есть кошка.' },
+      { ro: 'tu ai',              ru: 'у тебя есть',              tr: 'ту ай',
+        ex: 'Tu ai timp?', exRu: 'У тебя есть время?' },
+      { ro: 'el are',             ru: 'у него есть',              tr: 'ел аре',
+        ex: 'El are o mașină.', exRu: 'У него есть машина.' },
+      { ro: 'ea are',             ru: 'у неё есть',               tr: 'я аре',
+        ex: 'Ea are doi copii.', exRu: 'У неё двое детей.' },
+      { ro: 'noi avem',           ru: 'у нас есть',               tr: 'ной авем',
+        ex: 'Noi avem curs azi.', exRu: 'У нас сегодня занятие.' },
+      { ro: 'voi aveți',          ru: 'у вас есть',               tr: 'вой авець',
+        ex: 'Voi aveți întrebări?', exRu: 'У вас есть вопросы?' },
+      { ro: 'ei au',              ru: 'у них есть',               tr: 'ей ау', syn: 'they-have',
+        ex: 'Ei au o casă mare.', exRu: 'У них большой дом.' },
+      { ro: 'ele au',             ru: 'у них (ж.) есть',          tr: 'еле ау', syn: 'they-have',
+        ex: 'Ele au multe cărți.', exRu: 'У них много книг.' },
+
+      { ro: 'eu am fost',         ru: 'я был(а)',                 tr: 'еу ам фост',
+        ex: 'Eu am fost la piață.', exRu: 'Я был(а) на рынке.' },
+      { ro: 'tu ai fost',         ru: 'ты был(а)',                tr: 'ту ай фост',
+        ex: 'Tu ai fost la mare?', exRu: 'Ты был(а) на море?' },
+      { ro: 'el a fost',          ru: 'он был',                   tr: 'ел а фост',
+        note: 'a — вспомогательный глагол (не «are»).',
+        ex: 'El a fost acasă.', exRu: 'Он был дома.' },
+      { ro: 'ea a fost',          ru: 'она была',                 tr: 'я а фост',
+        note: 'a — вспомогательный глагол (не «are»).',
+        ex: 'Ea a fost la doctor.', exRu: 'Она была у врача.' },
+      { ro: 'noi am fost',        ru: 'мы были',                  tr: 'ной ам фост',
+        note: 'am — вспомогательный глагол (не «avem»).',
+        ex: 'Noi am fost la munte.', exRu: 'Мы были в горах.' },
+      { ro: 'voi ați fost',       ru: 'вы были',                  tr: 'вой аць фост',
+        note: 'ați — вспомогательный глагол (не «aveți»).',
+        ex: 'Voi ați fost la Sibiu?', exRu: 'Вы были в Сибиу?' },
+      { ro: 'ei au fost',         ru: 'они были',                 tr: 'ей ау фост', syn: 'they-were',
+        ex: 'Ei au fost ieri la curs.', exRu: 'Они вчера были на занятии.' },
+      { ro: 'ele au fost',        ru: 'они (ж.) были',            tr: 'еле ау фост', syn: 'they-were',
+        ex: 'Ele au fost în parc.', exRu: 'Они были в парке.' },
     ],
   },
 

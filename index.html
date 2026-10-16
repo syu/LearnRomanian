@@ -268,6 +268,26 @@
   .card.learned { opacity: .55; }
   .hidden-txt { filter: blur(7px); cursor: pointer; user-select: none; }
 
+  /* ---------- tables ---------- */
+  .vtable { margin-top: 24px; }
+  .vtable + .vtable { margin-top: 48px; }
+  .vtable h2 { margin: 0 0 14px; font: 700 28px var(--word); }
+  .vscroll { overflow-x: auto; }
+  .vtable table { border-collapse: separate; border-spacing: 0; background: var(--paper); border: 1px solid var(--line);
+    border-radius: var(--r-lg); overflow: hidden; }
+  .vtable th, .vtable td { padding: 0; text-align: left; border-bottom: 1px solid var(--line); }
+  .vtable tbody tr:last-child > * { border-bottom: none; }
+  .vtable thead > tr > * { background: var(--c, var(--lavender)); padding: 14px 20px 12px; vertical-align: bottom; }
+  .vtable thead th { font: 700 20px/1.2 var(--word); white-space: nowrap; }
+  .vtable thead th small { display: block; margin-top: 2px; font: 400 13px var(--ui); color: #3d4f53; }
+  .vtable tbody th { padding: 0 20px; font: 500 18px var(--word); color: var(--muted); white-space: nowrap; }
+  .vform { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; padding: 12px 20px;
+    border: none; background: none; text-align: left; font: 700 24px/1.2 var(--word); white-space: nowrap; transition: background .15s; }
+  .vform .ico { width: 16px; height: 16px; color: var(--teal); opacity: .35; transition: opacity .15s; }
+  .vform:hover { background: var(--teal-soft); }
+  .vform:hover .ico, .vform:focus-visible .ico { opacity: 1; }
+  .vnotes { margin: 18px 0 0; padding-left: 20px; display: grid; gap: 6px; max-width: 72ch; font-size: 15px; color: var(--muted); }
+
   /* ---------- results ---------- */
   .result { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 48px; align-items: center;
     border-bottom: 1px solid var(--line); padding: 8px 0 40px; }
@@ -425,6 +445,7 @@ const isLearned = w => learned.has(w.key);
 
 const saveSettings = () => LS.set('settings', settings);
 const selectedWords = () => TOPICS.filter(t => selected.includes(t.id)).flatMap(t => t.words);
+const selectedTables = () => TOPICS.filter(t => selected.includes(t.id)).flatMap(t => (t.tables || []).map(tb => ({ ...tb, topic: t.id })));
 const practiceWords = () => selectedWords().filter(w => !isLearned(w));
 function record(w, ok) {
   const s = stats[w.key] || (stats[w.key] = { c: 0, w: 0 });
@@ -593,7 +614,8 @@ const mixType = w => pickRandom(hasPic(w) ? QUIZ_TYPES : QUIZ_TYPES.filter(t => 
 const sameSyn = (a, b) => !!(a.syn && a.syn === b.syn);
 const MODE_GROUPS = [
   { name: 'Изучение', color: 'var(--lavender)', modes: [
-    { id: 'cards', name: 'Карточки', desc: 'Посмотреть, послушать, проверить себя' }] },
+    { id: 'cards', name: 'Карточки', desc: 'Посмотреть, послушать, проверить себя' },
+    { id: 'tables', name: 'Таблицы', desc: 'Формы глаголов в одной таблице' }] },
   { name: 'Перевод', color: 'var(--apricot)', modes: [
     { id: 'ro-ru', name: 'RO → RU', desc: 'Выбрать перевод слова' },
     { id: 'ru-ro', name: 'RU → RO', desc: 'Выбрать румынское слово' },
@@ -690,8 +712,10 @@ function renderHome() {
     <section class="modes" aria-label="Другие режимы">
       ${MODE_GROUPS.map(g => `<div class="mgroup"><h3>${g.name}</h3>
         ${g.modes.map(m => `<button class="chip" style="--c:${g.color}" data-mode="${m.id}"
-          ${(m.id === 'cards' ? selectedWords() : sel).length < (m.id === 'cards' ? 1 : 2) ? 'disabled' : ''}>
-          <b>${m.name}</b><span>${m.desc}</span></button>`).join('')}
+          ${m.id === 'tables' ? (selectedTables().length ? '' : 'disabled')
+            : (m.id === 'cards' ? selectedWords() : sel).length < (m.id === 'cards' ? 1 : 2) ? 'disabled' : ''}>
+          <b>${m.name}</b><span>${m.id === 'tables' && !selectedTables().length
+            ? 'Выберите тему: ' + esc(TOPICS.filter(t => t.tables).map(t => t.name).join(', ')) : m.desc}</span></button>`).join('')}
       </div>`).join('')}
     </section>
 
@@ -785,6 +809,7 @@ function sessionWords(words = practiceWords()) {
 }
 
 function startMode(mode, words) {
+  if (mode === 'tables') return renderTables();
   if (mode !== 'cards') words = words.filter(w => !isLearned(w));
   if (!words.length) { toast('Все эти слова отмечены как выученные'); return; }
   last = { mode, words };
@@ -1171,6 +1196,50 @@ function renderCards(words, title = 'Карточки') {
   });
   app.querySelectorAll('.hidden-txt').forEach(el => el.onclick = e => { e.stopPropagation(); el.classList.remove('hidden-txt'); });
   app.querySelectorAll('[data-ex]').forEach(el => el.onclick = () => Speech.say({ ro: sorted[+el.dataset.ex].ex }));
+}
+
+/* ================= tables ================= */
+let tableHide = LS.get('tableHide', false);   // forms blurred for self-check
+function renderTables() {
+  screen = 'tables';
+  sayRegistry = [];
+  const tables = selectedTables();
+  const cells = [];   // what each form button says: "pronoun form", using the word's own recording
+  const cell = (pron, form) => {
+    const text = pron.split('/')[0].trim() + ' ' + form;
+    cells.push(BY_KEY.get(text) || { ro: text });
+    return `<button class="vform" data-cell="${cells.length - 1}" title="Послушать: ${esc(text)}">
+      <span class="${tableHide ? 'hidden-txt' : ''}">${esc(form)}</span>${icon('speaker')}</button>`;
+  };
+  const hbtn = (v, label) => `<button class="rbtn ${tableHide === v ? 'on' : ''}" data-th="${v}" aria-pressed="${tableHide === v}">${label}</button>`;
+  setRail(`
+    ${brand()}
+    <div class="session">
+      <div class="mode">Таблицы</div>
+      <div class="count" style="margin-top:14px">${tables.length} <small>${plural(tables.length, 'таблица', 'таблицы', 'таблиц')}</small></div></div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      ${hbtn(false, 'Показать всё')}${hbtn(true, 'Скрыть формы')}
+    </div>
+    <div class="rnote">Нажмите на форму, чтобы послушать её с местоимением${tableHide ? ' и открыть' : ''}.</div>
+    <div class="rail-foot"><button class="rbtn" data-act="menu">${icon('back')} В меню <kbd>Esc</kbd></button></div>
+  `, true);
+  setHTML(tables.map(tb => `
+    <section class="vtable" style="--c:${topicColor(tb.topic)}">
+      <h2>${esc(tb.title)}</h2>
+      <div class="vscroll"><table>
+        <thead><tr><td></td>${tb.cols.map(c => `<th scope="col">${esc(c.ro)}<small>${esc(c.ru || '')}</small></th>`).join('')}</tr></thead>
+        <tbody>${tb.rows.map(([pron, ...forms]) => `<tr><th scope="row">${esc(pron)}</th>
+          ${forms.map(f => `<td>${cell(pron, f)}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table></div>
+      ${tb.notes && tb.notes.length ? `<ul class="vnotes">${tb.notes.map(n => `<li>${esc(n)}</li>`).join('')}</ul>` : ''}
+    </section>`).join(''));
+  rail.querySelectorAll('[data-th]').forEach(b => b.onclick = () => {
+    tableHide = b.dataset.th === 'true'; LS.set('tableHide', tableHide); renderTables();
+  });
+  app.querySelectorAll('[data-cell]').forEach(b => b.onclick = () => {
+    b.querySelector('.hidden-txt')?.classList.remove('hidden-txt');
+    Speech.say(cells[+b.dataset.cell]);
+  });
 }
 
 /* ================= results ================= */
