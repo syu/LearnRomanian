@@ -337,8 +337,11 @@
     .rail.sess .rbtn { padding: 8px 12px; }
     .page { padding: 22px 16px 40px; }
     .page.home { display: flex; flex-direction: column; }
-    .page.home .start { order: 1; margin-top: 18px; } .page.home .plate { order: 2; }
+    .page.home .start { order: 1; margin-top: 18px; } .page.home .plate, .page.home .vtable { order: 2; }
     .page.home .modes { order: 3; } .page.home .settings { order: 4; } .hintline { display: none; }
+    .vtable thead > tr > *, .vtable tbody th { padding-left: 10px; padding-right: 10px; }
+    .vtable thead th { font-size: 17px; white-space: normal; } .vtable tbody th { font-size: 15px; }
+    .vform { padding: 10px 8px; gap: 6px; font-size: 19px; } .vform .ico { display: none; }
     .word { --k: .62; font-size: calc(var(--fs, 100) * var(--k) * 1px); }
     .plate, .qplate { grid-template-columns: 96px minmax(0, 1fr); gap: 18px; padding: 22px 0; min-height: 0; }
     .plate .tile, .qplate .tile, .spk.tile { width: 96px; height: 96px; font-size: 62px; border-radius: 18px; }
@@ -720,6 +723,8 @@ function renderHome() {
     </button>
     <div class="hintline">Enter — начать. Во время занятия: <kbd>1</kbd>–<kbd>${settings.options}</kbd> ответ, <kbd>Enter</kbd> дальше, <kbd>R</kbd> звук, <kbd>Esc</kbd> выход.</div>
 
+    ${tablesHTML(selectedTables())}
+
     <section class="modes" aria-label="Другие режимы">
       ${MODE_GROUPS.map(g => `<div class="mgroup"><h3>${g.name}</h3>
         ${g.modes.map(m => `<button class="chip" style="--c:${g.color}" data-mode="${m.id}"
@@ -749,6 +754,7 @@ function renderHome() {
     </details>
   `);
   renderVoiceUI();
+  bindTables();
 
   rail.querySelectorAll('[data-topic]').forEach(b => b.onclick = () => {
     const id = b.dataset.topic;
@@ -1211,17 +1217,38 @@ function renderCards(words, title = 'Карточки') {
 
 /* ================= tables ================= */
 let tableHide = LS.get('tableHide', false);   // forms blurred for self-check
+/* Topic tables: render with tablesHTML(), activate with bindTables() after innerHTML.
+   Shown on the home page for the selected topics and in the "Таблицы" mode. */
+let tableCells = [];   // what each form button says: "pronoun form", using the word's own recording
+function tablesHTML(tables, hide = false) {
+  tableCells = [];
+  const cell = (pron, form) => {
+    const text = pron.split('/')[0].trim() + ' ' + form;
+    tableCells.push(BY_KEY.get(text) || { ro: text });
+    return `<button class="vform" data-cell="${tableCells.length - 1}" title="Послушать: ${esc(text)}">
+      <span class="${hide ? 'hidden-txt' : ''}">${esc(form)}</span>${icon('speaker')}</button>`;
+  };
+  return tables.map(tb => `
+    <section class="vtable" style="--c:${topicColor(tb.topic)}">
+      <h2>${esc(tb.title)}</h2>
+      <div class="vscroll"><table>
+        <thead><tr><td></td>${tb.cols.map(c => `<th scope="col">${esc(c.ro)}<small>${esc(c.ru || '')}</small></th>`).join('')}</tr></thead>
+        <tbody>${tb.rows.map(([pron, ...forms]) => `<tr><th scope="row">${esc(pron)}</th>
+          ${forms.map(f => `<td>${cell(pron, f)}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table></div>
+      ${tb.notes && tb.notes.length ? `<ul class="vnotes">${tb.notes.map(n => `<li>${esc(n)}</li>`).join('')}</ul>` : ''}
+    </section>`).join('');
+}
+function bindTables() {
+  app.querySelectorAll('[data-cell]').forEach(b => b.onclick = () => {
+    b.querySelector('.hidden-txt')?.classList.remove('hidden-txt');
+    Speech.say(tableCells[+b.dataset.cell]);
+  });
+}
 function renderTables() {
   screen = 'tables';
   sayRegistry = [];
   const tables = selectedTables();
-  const cells = [];   // what each form button says: "pronoun form", using the word's own recording
-  const cell = (pron, form) => {
-    const text = pron.split('/')[0].trim() + ' ' + form;
-    cells.push(BY_KEY.get(text) || { ro: text });
-    return `<button class="vform" data-cell="${cells.length - 1}" title="Послушать: ${esc(text)}">
-      <span class="${tableHide ? 'hidden-txt' : ''}">${esc(form)}</span>${icon('speaker')}</button>`;
-  };
   const hbtn = (v, label) => `<button class="rbtn ${tableHide === v ? 'on' : ''}" data-th="${v}" aria-pressed="${tableHide === v}">${label}</button>`;
   setRail(`
     ${brand()}
@@ -1234,22 +1261,10 @@ function renderTables() {
     <div class="rnote">Нажмите на форму, чтобы послушать её с местоимением${tableHide ? ' и открыть' : ''}.</div>
     <div class="rail-foot"><button class="rbtn" data-act="menu">${icon('back')} В меню <kbd>Esc</kbd></button></div>
   `, true);
-  setHTML(tables.map(tb => `
-    <section class="vtable" style="--c:${topicColor(tb.topic)}">
-      <h2>${esc(tb.title)}</h2>
-      <div class="vscroll"><table>
-        <thead><tr><td></td>${tb.cols.map(c => `<th scope="col">${esc(c.ro)}<small>${esc(c.ru || '')}</small></th>`).join('')}</tr></thead>
-        <tbody>${tb.rows.map(([pron, ...forms]) => `<tr><th scope="row">${esc(pron)}</th>
-          ${forms.map(f => `<td>${cell(pron, f)}</td>`).join('')}</tr>`).join('')}</tbody>
-      </table></div>
-      ${tb.notes && tb.notes.length ? `<ul class="vnotes">${tb.notes.map(n => `<li>${esc(n)}</li>`).join('')}</ul>` : ''}
-    </section>`).join(''));
+  setHTML(tablesHTML(tables, tableHide));
+  bindTables();
   rail.querySelectorAll('[data-th]').forEach(b => b.onclick = () => {
     tableHide = b.dataset.th === 'true'; LS.set('tableHide', tableHide); renderTables();
-  });
-  app.querySelectorAll('[data-cell]').forEach(b => b.onclick = () => {
-    b.querySelector('.hidden-txt')?.classList.remove('hidden-txt');
-    Speech.say(cells[+b.dataset.cell]);
   });
 }
 
