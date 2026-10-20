@@ -432,8 +432,8 @@ const settings = Object.assign(
 // "baza" was split into saluturi, politete and oras
 let selected = LS.get('topics', []).flatMap(id => id === 'baza' ? ['saluturi', 'politete', 'oras'] : [id])
   .filter((id, i, a) => TOPICS.some(t => t.id === id) && a.indexOf(id) === i);
-// first visit: start with the first vocabulary topic, not the grammar tables
-if (!selected.length && TOPICS.length) selected = [(TOPICS.find(t => !t.tables) || TOPICS[0]).id];
+// first visit: start with the first vocabulary topic, not the verb topics (own colour)
+if (!selected.length && TOPICS.length) selected = [(TOPICS.find(t => !t.tables && !t.color) || TOPICS[0]).id];
 const BY_KEY = new Map(ALL.map(w => [w.key, w]));
 // A word's key is the Romanian word itself, so stats survive moving it to another topic.
 // Older versions stored "topic|word"; merge those into the plain key once.
